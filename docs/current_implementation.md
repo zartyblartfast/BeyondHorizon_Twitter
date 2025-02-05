@@ -81,3 +81,57 @@ Try your own calculations at https://beyondhorizoncalc.com
 2. **Google Maps API**
    - For static maps (future)
    - API key will be needed
+
+## Next Steps
+
+### 1. Azure Functions Integration (Priority)
+- Set up Azure Functions API for calculations
+- Required calculations:
+  * Distance to Horizon
+  * Horizon Dip Angle
+  * Hidden Height
+  * Visible Height
+- Integration points:
+  * API endpoint configuration
+  * Authentication setup
+  * Response handling
+  * Fallback to pre-calculated results
+
+### 2. Visual Content Enhancement
+- Maps integration:
+  * Static maps showing LoS path
+  * Target location images
+  * Image caching system
+- Twitter card preview optimization
+- Image attribution handling
+
+### 3. Deployment Setup
+- PythonAnywhere configuration:
+  * Environment setup
+  * Domain whitelisting
+  * Scheduled tasks
+  * Error monitoring
+- Production environment variables
+- Logging and monitoring
+
+### 4. Community Features
+- Location submission process:
+  * Verification workflow
+  * Contributor recognition
+  * Attribution tracking
+- Web calculator integration:
+  * Cross-linking
+  * Custom calculation support
+  * Result sharing
+
+### Timeline
+1. Week 1-2: Azure Functions setup and integration
+2. Week 3: Visual content system
+3. Week 4: PythonAnywhere deployment
+4. Week 5+: Community features rollout
+
+### Dependencies Required
+- Azure Functions subscription
+- Google Maps API key
+- PythonAnywhere paid account (for whitelist support)
+- Additional Python packages (TBD based on Azure Functions requirements)
