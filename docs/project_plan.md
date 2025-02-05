@@ -1,132 +1,200 @@
 # Beyond Horizon Twitter AI Agent
 
 ## Project Overview
-An AI-powered Twitter bot that automates the sharing of fascinating Long Line of Sight (LoS) views from around the world. This non-commercial project aims to educate and engage users about remarkable viewpoints where distant landmarks or locations are visible from specific observation points.
+An AI-powered Twitter bot that automates the sharing of fascinating Long Line of Sight (LoS) views from around the world. This project aims to build an engaged community around remarkable viewpoints, encouraging users to discover, verify, and contribute new LoS locations using our web-based calculation tool at [website_url].
+
+## Project Goals
+1. Share verified LoS views with accurate calculations
+2. Build an engaged community of LoS enthusiasts
+3. Encourage discovery of new LoS locations
+4. Maintain a curated database of verified viewpoints
+5. Recognize community contributions
 
 ## Technical Architecture
 
 ### Core Technologies
 - Python-based implementation
-- OpenAI GPT-4 for content generation
 - Twitter/X API via Tweepy for social media interaction
 - Azure Functions-based LoS Calculation API
-- Mapping APIs for visualization and verification
+- Google Maps API for visualization (Phase 2)
+- PythonAnywhere for hosting
+
+### Data Sources
+1. **Preset Locations**
+   - Source: BeyondHorizonCalc GitHub repository
+   - Data: presets.json with location pairs
+   - Required calculations:
+     * Distance to Horizon
+     * Horizon Dip Angle
+     * Hidden Height
+     * Visible Height
+
+2. **Calculation Engine**
+   - Azure Functions API for dynamic calculations
+   - Fallback to pre-calculated results for presets
 
 ## Development Phases
 
-### Phase 1: Basic Content Generation and Posting
+### Phase 1: Core Infrastructure and Data Management
 
 #### Objective
-Establish foundational automated tweet posting system using GPT-4 and Twitter/X integration.
+Establish foundational data management and calculation system for meaningful LoS content.
 
 #### Implementation Details
-1. **Development Environment Setup**
-   - Python environment with required dependencies
-   - Git repository for version control
-   - Key libraries: `openai`, `tweepy`
+1. **Data Source Integration**
+   - GitHub repository connection
+   - Preset location data parsing
+   - Data validation and error handling
 
-2. **OpenAI API Integration**
-   - Custom prompt engineering for LoS content
-   - Tweet draft generation and validation
-   
-3. **Twitter/X API Integration**
-   - Tweepy-based authentication
-   - Automated posting functionality
-   - Scheduled posting system
+2. **Results Integration**
+   - Pre-calculate results for preset locations
+   - Store extended preset data
+   - Design data structure for calculations
 
-4. **Monitoring System**
-   - Tweet logging (content, timestamp, status)
-   - Engagement tracking
+3. **Tweet Content Structure**
+   - Location information formatting
+   - Calculation result presentation
+   - Refraction level display
 
-### Phase 2: LoS API Integration
+4. **Azure Functions Integration**
+   - API endpoint setup
+   - Authentication implementation
+   - Response handling
+   - Fallback mechanisms
+
+### Phase 2: Enhanced Content and Visualization
 
 #### Objective
-Enhance tweet accuracy with Azure Functions-based LoS calculations.
+Enhance tweets with professional visual content and relevant historical/scientific context.
 
 #### Implementation Details
-1. **API Integration**
-   - Azure Functions endpoint connection
-   - Data parsing for LoS parameters
-   - Robust error handling
+1. **Visual Content Integration**
+   - Google Maps static image showing LoS path
+   - Target location photographs
+   - Image caching and management
+   - Proper attribution for images
 
-2. **Enhanced Content Generation**
-   - Data-driven GPT-4 prompts
-   - Verified LoS calculations in tweets
+2. **Content Enhancement**
+   - Historical records and achievements
+   - Scientific context and calculations
+   - Link to web calculator for custom experiments
+   - Community contribution highlights
 
-### Phase 3: Mapping Integration
+3. **Professional Presentation**
+   - Clean, technical format
+   - Relevant links and citations
+   - Contributor attribution
+   - Web tool integration
+
+### Phase 3: Community Engagement and Automation
 
 #### Objective
-Add visual elements and distance verification through mapping API integration.
+Build an active community while maintaining reliable automated posting.
 
 #### Implementation Details
-1. **Mapping Service Integration**
-   - API selection and setup
-   - Distance verification system
-   
-2. **Visual Content Generation**
-   - Static map generation
-   - Location markers and LoS visualization
-   - Image handling for tweets
+1. **Community Management**
+   - Contribution verification system
+   - Attribution tracking
+   - Contributor recognition in posts
+   - Community guidelines
 
-### Phase 4: Interactive Engagement
+2. **Data Structure Enhancement**
+   - Update presets.json schema:
+     ```json
+     {
+       "id": "unique_identifier",
+       "contributor": {
+         "name": "Display Name",
+         "twitter": "@handle",
+         "date_added": "YYYY-MM-DD"
+       },
+       "locations": {
+         // existing location data
+       },
+       "verification": {
+         "status": "verified",
+         "method": "calculation/photograph/historical",
+         "date": "YYYY-MM-DD"
+       }
+     }
+     ```
+
+3. **Engagement Strategy**
+   - Call for new locations
+   - Recognition of contributors
+   - Regular website promotion
+   - Custom calculation encouragement
+   - Community success stories
+
+4. **Scheduling System**
+   - Strategic posting times
+   - Content mix (presets vs. new discoveries)
+   - Contributor highlight rotation
+   - Seasonal considerations
+
+### Phase 4: Analytics and Community Growth
 
 #### Objective
-Implement intelligent user interaction handling.
+Track engagement and optimize community growth.
 
 #### Implementation Details
-1. **Interaction Monitoring**
-   - Real-time mention and reply tracking
-   - Message analysis system
+1. **Analytics System**
+   - Community growth metrics
+   - Contribution tracking
+   - Engagement analysis
+   - Website traffic correlation
 
-2. **Automated Responses**
-   - Context-aware reply generation
-   - LoS suggestion processing
-   - Data verification workflow
+2. **Growth Optimization**
+   - Content timing optimization
+   - Contribution incentives
+   - Community recognition programs
+   - Cross-platform promotion
 
-### Phase 5: Web Integration
+## Tweet Content Structure
+1. **Core Technical Data**
+   - Location details and heights
+   - Distance and calculations
+   - Refraction conditions
 
-#### Objective
-Create synergy between Twitter presence and web platform.
+2. **Engagement Elements**
+   - Maps and photographs
+   - Link to web calculator
+   - Contributor attribution (if applicable)
+   - Call for new discoveries
 
-#### Implementation Details
-1. **Content Management**
-   - Dynamic example updates
-   - Quality content curation
+3. **Website Integration**
+   - Custom calculation promotion
+   - Preset database access
+   - Contribution guidelines
+   - Community recognition
 
-2. **Interactive Features**
-   - Map visualization integration
-   - Cross-platform consistency
-
-3. **Platform Synergy**
-   - Strategic cross-promotion
-   - User engagement optimization
-
-## Success Metrics
-- Tweet engagement rates
-- User interaction quality
-- LoS suggestion accuracy
-- Web traffic conversion
-- Content quality and accuracy
-
-## Future Considerations
-- Machine learning for view prediction
-- Community-driven content validation
-- Advanced visualization features
-- International location support
-- Weather condition integration
+## Success Criteria
+1. Accurate LoS calculations
+2. Growing contributor base
+3. Regular new location submissions
+4. Active community engagement
+5. Quality of contributed locations
 
 ## Technical Requirements
-- Python 3.8+
-- OpenAI API access
-- Twitter/X Developer Account
-- Azure Functions subscription
-- Mapping API credentials
-- Secure environment for API keys
-- Reliable hosting solution
+1. Python 3.8+
+2. Required packages:
+   - tweepy>=4.14.0
+   - python-dotenv>=1.0.0
+   - requests>=2.31.0
+   - schedule>=1.2.0
+3. API Keys:
+   - Twitter API (OAuth 1.0a)
+   - Azure Functions
+   - Google Maps (Phase 2)
 
 ## Security Considerations
-- Secure API key management
-- Rate limiting implementation
-- Data validation and sanitization
-- Error handling and logging
-- User data privacy compliance
+1. Secure API key management
+2. Rate limiting compliance
+3. Error handling and logging
+4. Backup systems for API failures
+
+## Maintenance Plan
+1. Regular data updates
+2. Contribution verification
+3. Community management
+4. Attribution accuracy
