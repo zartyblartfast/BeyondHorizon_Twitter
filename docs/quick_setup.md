@@ -48,23 +48,36 @@ TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
 ## 3. Setup Steps
 1. Clone repository or create directory structure
 2. Copy `config.template.env` to `.env` and add Twitter credentials
-3. Create virtual environment:
+3. Create and activate virtual environment:
    ```bash
+   # Create virtual environment
    python -m venv venv
-   .\venv\Scripts\activate  # Windows
+   
+   # Activate virtual environment (choose one):
+   .\venv\Scripts\activate     # Windows PowerShell
+   .\venv\Scripts\activate.bat # Windows CMD
+   source venv/bin/activate    # Linux/Mac
+   
+   # Confirm activation - you should see (venv) in your prompt
+   # Example: (venv) PS C:\Users\username\BeyondHorizon_Twitter>
    ```
 4. Install dependencies:
    ```bash
+   # Make sure your virtual environment is activated (see step 3)
    pip install -r requirements.txt
    ```
 5. Run test:
    ```bash
+   # Make sure your virtual environment is activated (see step 3)
+   
    # Preview tweet without posting (dry run)
    python src/test_tweet.py --dry-run
 
    # Post actual tweet
    python src/test_tweet.py
    ```
+
+> **Important**: Always ensure your virtual environment is activated (you should see `(venv)` in your prompt) before running any Python commands. This isolates the project dependencies and prevents conflicts with your system Python packages.
 
 ## 4. Rate Limiting
 The Twitter API has rate limits that affect how frequently you can post:

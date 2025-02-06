@@ -59,14 +59,32 @@ Try your own calculations at https://beyondhorizoncalc.com
 
 ## Running Test Tweet
 1. Ensure virtual environment is activated:
-   ```
-   .\venv\Scripts\activate  # Windows
+   ```bash
+   # Create virtual environment (if not already created)
+   python -m venv venv
+   
+   # Activate virtual environment (choose one):
+   .\venv\Scripts\activate     # Windows PowerShell
+   .\venv\Scripts\activate.bat # Windows CMD
+   source venv/bin/activate    # Linux/Mac
+   
+   # Your prompt should show (venv), example:
+   # (venv) PS C:\Users\username\BeyondHorizon_Twitter>
    ```
 
 2. Run test script:
-   ```
+   ```bash
+   # Preview tweet without posting
+   python src/test_tweet.py --dry-run
+   
+   # Post actual tweet (respects rate limits)
    python src/test_tweet.py
    ```
+
+> **Note**: The virtual environment isolates project dependencies. If you see import errors or unexpected behavior, make sure:
+> 1. You see `(venv)` in your prompt
+> 2. You've installed dependencies: `pip install -r requirements.txt`
+> 3. You're in the project root directory
 
 ## Dependencies
 - tweepy>=4.14.0
