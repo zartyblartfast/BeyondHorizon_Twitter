@@ -1,15 +1,20 @@
 import json
 import random
+import logging
 import requests
 from datetime import datetime, timedelta
-import logging
+from pathlib import Path
 
-logging.basicConfig(level=logging.INFO)
+# Configure logging with a cleaner format
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'  # Only show the message, no timestamps or levels
+)
 logger = logging.getLogger(__name__)
 
 class LocationManager:
     def __init__(self):
-        self.url = "https://raw.githubusercontent.com/zartyblartfast/beyondHorizonCalc/main/assets/info/presets.json"
+        self.url = "https://raw.githubusercontent.com/zartyblartfast/BeyondHorizonCalc/main/assets/info/presets.json"
         self.locations = None
         self.last_update = None
 
@@ -20,7 +25,7 @@ class LocationManager:
             response.raise_for_status()  # Raises an HTTPError for bad responses
             self.locations = response.json()
             self.last_update = datetime.now()
-            logger.info(f"Successfully loaded {len(self.locations['presets'])} locations")
+            logger.info(f"Loaded {len(self.locations['presets'])} locations from GitHub")
         except Exception as e:
             logger.error(f"Failed to load locations: {str(e)}")
             raise
@@ -126,3 +131,12 @@ class LocationManager:
         if not self.locations or self.needs_refresh():
             self.load_locations()
         return self.locations
+
+    def get_image_urls(self, location):
+        """Get list of non-null image URLs from location"""
+        image_urls = []
+        for i in range(1, 5):  # Check imageURL_1 through imageURL_4
+            url = location['details'].get(f'imageURL_{i}')
+            if url:  # Only add non-null URLs
+                image_urls.append(url)
+        return image_urls

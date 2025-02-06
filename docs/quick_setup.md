@@ -59,10 +59,31 @@ TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
    ```
 5. Run test:
    ```bash
+   # Preview tweet without posting (dry run)
+   python src/test_tweet.py --dry-run
+
+   # Post actual tweet
    python src/test_tweet.py
    ```
 
-## 4. Key Dependencies
+## 4. Rate Limiting
+The Twitter API has rate limits that affect how frequently you can post:
+- Maximum 200 tweets per 3-hour window (about 1 tweet per minute)
+- Maximum 300 media uploads per 3-hour window
+
+The script automatically handles rate limiting by:
+- Waiting 3 minutes between tweets to stay well within limits
+- Showing a countdown when waiting due to rate limits
+- Providing clear error messages if rate limits are hit
+
+## 5. Key Features
+- Formats tweets with location details, distance, and refraction data
+- Supports up to 4 images per tweet
+- Preview mode (--dry-run) to review tweet content before posting
+- Automatic rate limit handling
+- Error handling for network and API issues
+
+## 6. Key Dependencies
 - Access to BeyondHorizonCalc presets.json for location data
 - Twitter API access for posting tweets
 - Python packages (tweepy, python-dotenv, requests)
