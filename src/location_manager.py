@@ -70,34 +70,24 @@ class LocationManager:
 
     def format_tweet(self, location):
         """Format location data into a tweet"""
-        obs = location['details']['location']['observer']
-        tgt = location['details']['location']['target']
-
-        # Get attribution data from details
-        attribution = location['details'].get('attribution', '')
-        attribution_text = f"\nContributed by {attribution}" if attribution else ""
-
-        # Zero-width character to prevent URL preview
-        no_preview = "‌"
-
-        # Build tweet components separately to ensure clean formatting
-        line1 = f"From {obs['name']} ({location['observerHeight']}m) in {obs['country']} to {tgt['name']} ({location['targetHeight']}m) in {tgt['country']}"
-        line2 = f"Distance: {location['distance']}km"
-        line3 = f"Refraction: {self.format_refraction(location['refractionFactor'])}"
-        line4 = f"Try your own calculations at {no_preview}https://beyondhorizoncalc.com"
-        line5 = "#LongLineOfSight #BeyondHorizon"
-
-        # Combine with proper line breaks
-        tweet = f"{line1}\n{line2}\n{line3}\n{line4}\n{line5}"
+        # Get observer and target info
+        observer = location['details']['location']['observer']
+        target = location['details']['location']['target']
+        
+        # Format the tweet content
+        tweet_lines = [
+            f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
+            f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km",
+            f"🌤️ Refraction: {self.format_refraction(location['refractionFactor'])}",
+            f"Full details & calculations: https://beyondhorizoncalc.com",
+            "#LongLineOfSight #BeyondHorizon"
+        ]
         
         # Add attribution if present
-        if attribution_text:
-            tweet = tweet + attribution_text
+        if location['details'].get('attribution'):
+            tweet_lines.append(f"📸 {location['details']['attribution']}")
         
-        # Add final newline
-        tweet = tweet + "\n"
-        
-        return tweet
+        return "\n".join(tweet_lines)
 
     def force_refresh(self):
         """Force a refresh of the location data"""
