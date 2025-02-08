@@ -126,15 +126,25 @@ def send_email_report(report_content):
             # On PythonAnywhere, use their API
             try:
                 import requests
-                response = requests.post(
-                    "https://api.pythonanywhere.com/api/v0/user/BeyondHorizon/mail/",
-                    headers={"Authorization": "Token " + os.getenv('PA_API_TOKEN')},
-                    json={
-                        "to": to_email,
-                        "subject": subject,
-                        "html": html_content
-                    }
-                )
+                
+                # Debug API request
+                api_url = "https://api.pythonanywhere.com/api/v0/user/BeyondHorizon/mail/"
+                headers = {"Authorization": f"Token {pa_token}"}
+                data = {
+                    "to": to_email,
+                    "subject": subject,
+                    "html": html_content
+                }
+                
+                print("\nDebug: API request details:")
+                print(f"URL: {api_url}")
+                print(f"Headers: {headers}")
+                print(f"Data keys: {list(data.keys())}")
+                
+                response = requests.post(api_url, headers=headers, json=data)
+                print(f"Response status: {response.status_code}")
+                print(f"Response text: {response.text}")
+                
                 if response.status_code != 200:
                     raise Exception(f"API returned {response.status_code}: {response.text}")
             except ImportError:
