@@ -85,11 +85,8 @@ def send_email_report(report_content):
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
     
-    # Create message
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = f'BeyondHorizon Tweet Report - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
+    # Create email subject
+    subject = f'BeyondHorizon Tweet Report - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
     
     # Convert the report to HTML format
     html_content = f"""
@@ -109,25 +106,19 @@ def send_email_report(report_content):
     """
     
     try:
-        # Check if we're on PythonAnywhere
-        if 'PYTHONANYWHERE_DOMAIN' in os.environ:
-            # Use PythonAnywhere's built-in email service
-            from pythonanywhere.email import send_email
-            send_email(
-                to_email,
-                from_email,
-                msg['Subject'],
-                html_content,
-                html=True
-            )
-        else:
-            # For local testing, just print the email
+        # For local testing, just print the email
+        if 'PYTHONANYWHERE_SITE' not in os.environ:
             print("\nEmail would be sent with following content:")
             print(f"From: {from_email}")
             print(f"To: {to_email}")
-            print(f"Subject: {msg['Subject']}")
+            print(f"Subject: {subject}")
             print("\nContent:")
             print(html_content)
+        else:
+            # On PythonAnywhere, use the os.system to send email
+            import pipes
+            cmd = f"echo {pipes.quote(html_content)} | mail -s '{subject}' -a 'Content-Type: text/html' {to_email}"
+            os.system(cmd)
             
         print("\nEmail report handled successfully")
     except Exception as e:
