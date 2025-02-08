@@ -115,22 +115,31 @@ def send_email_report(report_content):
             print("\nContent:")
             print(html_content)
         else:
-            # On PythonAnywhere, use their email API
-            import smtplib
-            from email.mime.text import MIMEText
-            from email.mime.multipart import MIMEMultipart
-
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = from_email
-            msg['To'] = to_email
-            
-            # Attach HTML content
-            msg.attach(MIMEText(html_content, 'html'))
-
-            # Send using PythonAnywhere's SMTP server
-            with smtplib.SMTP('smtp.pythonanywhere.com') as server:
-                server.send_message(msg)
+            # On PythonAnywhere, use their API
+            try:
+                import requests
+                response = requests.post(
+                    "https://api.pythonanywhere.com/api/v0/user/BeyondHorizon/mail/",
+                    headers={"Authorization": "Token " + os.getenv('PA_API_TOKEN')},
+                    json={
+                        "to": to_email,
+                        "subject": subject,
+                        "html": html_content
+                    }
+                )
+                if response.status_code != 200:
+                    raise Exception(f"API returned {response.status_code}: {response.text}")
+            except ImportError:
+                print("\nFalling back to simple email...")
+                # Simple fallback using sendmail
+                import subprocess
+                msg = f"To: {to_email}\nFrom: {from_email}\nSubject: {subject}\nContent-Type: text/html\n\n{html_content}"
+                try:
+                    p = subprocess.Popen(["/usr/sbin/sendmail", "-t"], stdin=subprocess.PIPE)
+                    p.communicate(msg.encode())
+                except Exception as e:
+                    print(f"Sendmail error: {str(e)}")
+                    raise
             
         print("\nEmail report handled successfully")
     except Exception as e:
