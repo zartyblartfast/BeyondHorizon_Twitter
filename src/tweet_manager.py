@@ -115,10 +115,22 @@ def send_email_report(report_content):
             print("\nContent:")
             print(html_content)
         else:
-            # On PythonAnywhere, use the os.system to send email
-            import pipes
-            cmd = f"echo {pipes.quote(html_content)} | mail -s '{subject}' -a 'Content-Type: text/html' {to_email}"
-            os.system(cmd)
+            # On PythonAnywhere, use their email API
+            import smtplib
+            from email.mime.text import MIMEText
+            from email.mime.multipart import MIMEMultipart
+
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = from_email
+            msg['To'] = to_email
+            
+            # Attach HTML content
+            msg.attach(MIMEText(html_content, 'html'))
+
+            # Send using PythonAnywhere's SMTP server
+            with smtplib.SMTP('smtp.pythonanywhere.com') as server:
+                server.send_message(msg)
             
         print("\nEmail report handled successfully")
     except Exception as e:
