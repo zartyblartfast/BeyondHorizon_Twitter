@@ -121,17 +121,20 @@ class LocationManager:
                 # Compact format prioritizes calculation results
                 tweet_lines = [
                     f"{observer['name']} → {target['name']}",
-                    f"📏 {location['distance']}km | 🌤️ Refr: {self.format_refraction(location['refractionFactor'])}",
+                    f"{location['distance']}km | Refr: {self.format_refraction(location['refractionFactor'])}",
                     f"Hidden: {hidden_height}m | Visible: {visible_height}m",
                     "#BeyondHorizon"
                 ]
             else:
                 # Normal format includes more context
                 tweet_lines = [
-                    f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
-                    f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km | 🌤️ {self.format_refraction(location['refractionFactor'])}",
-                    f"📊 Hidden Height: {hidden_height}m | 👁️ Visible Height: {visible_height}m",
-                    f"Full details & calculations: https://beyondhorizoncalc.com",
+                    f"Long line of sight! 🌍",
+                    f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m) | {observer['country']}",
+                    f"Distance: {location['distance']}km | Refraction: {self.format_refraction(location['refractionFactor'])}",
+                    f"{target['name']}:",
+                    f"Hidden Height: {hidden_height}m | Visible Height: {visible_height}m",
+                    "",
+                    f"https://beyondhorizoncalc.com",
                     "#LongLineOfSight #BeyondHorizon"
                 ]
             
@@ -139,7 +142,7 @@ class LocationManager:
             if location['details'].get('attribution'):
                 full_tweet = "\n".join(tweet_lines)
                 if len(full_tweet) + len(location['details']['attribution']) + 6 <= 280:  # 280 is Twitter's limit
-                    tweet_lines.append(f"📸 {location['details']['attribution']}")
+                    tweet_lines.append(f"{location['details']['attribution']}")
             
             return "\n".join(tweet_lines)
             
@@ -148,8 +151,8 @@ class LocationManager:
             # Fallback format without calculations
             tweet_lines = [
                 f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
-                f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km",
-                f"🌤️ Refraction: {self.format_refraction(location['refractionFactor'])}",
+                f"{observer['country']} to {target['country']} | {location['distance']}km",
+                f"Refraction: {self.format_refraction(location['refractionFactor'])}",
                 "#LongLineOfSight #BeyondHorizon"
             ]
             return "\n".join(tweet_lines)
