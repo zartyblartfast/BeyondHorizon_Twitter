@@ -113,9 +113,9 @@ class LocationManager:
             logger.info("\nAPI Response:")
             logger.info(json.dumps(results, indent=2))
             
-            # Format heights with 1 decimal place
-            hidden_height = f"{results['hidden_height']:.1f}"
-            visible_height = f"{results['visible_target_height']:.1f}"
+            # Format heights with 1 decimal place (using API field names)
+            hidden_height = f"{results['h2']:.1f}"
+            visible_height = f"{results['h3']:.1f}"
             
             if format == 'compact':
                 # Compact format prioritizes calculation results
