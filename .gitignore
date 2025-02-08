@@ -1,6 +1,5 @@
 # Environment variables
-.env  # Re-enabled .env ignore
-config/.env  # Specifically ignore .env in config directory
+config/.env
 .venv
 env/
 venv/
