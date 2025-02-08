@@ -78,8 +78,10 @@ class TwitterClient:
                     # Download image to temporary file
                     response = requests.get(url)
                     if response.status_code == 200:
+                        # Extract filename from URL
+                        filename = url.split('/')[-1]
                         # Upload to Twitter
-                        media = api.media_upload(filename=None, file=io.BytesIO(response.content))
+                        media = api.media_upload(filename=filename, file=io.BytesIO(response.content))
                         media_ids.append(media.media_id)
 
             # Post tweet with media if we have any
