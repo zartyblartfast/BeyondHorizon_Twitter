@@ -79,9 +79,10 @@ def get_db_path():
 
 def send_email_report(report_content):
     """Send an email with the tweet history report."""
-    # Debug: Print current working directory and env file location
-    print(f"\nDebug: Current working directory: {os.getcwd()}")
-    env_path = os.path.join(os.getcwd(), 'config', '.env')
+    # Get absolute path to .env file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    env_path = os.path.join(os.path.dirname(script_dir), 'config', '.env')
+    print(f"\nDebug: Script directory: {script_dir}")
     print(f"Debug: Looking for .env file at: {env_path}")
     print(f"Debug: .env file exists: {os.path.exists(env_path)}")
     
@@ -93,6 +94,7 @@ def send_email_report(report_content):
     to_email = os.getenv('TO_EMAIL')
     pa_token = os.getenv('PA_API_TOKEN')
     username = 'BeyondHorizon'  # Your PythonAnywhere username
+    host = 'www.pythonanywhere.com'  # or 'eu.pythonanywhere.com' if you're on EU servers
     
     # Debug logging
     print("\nDebug: Environment variables:")
@@ -136,27 +138,43 @@ def send_email_report(report_content):
                 import requests
                 
                 # Debug API request
-                api_url = 'https://www.pythonanywhere.com/api/v0/user/{username}/mail/'.format(
-                    username=username
-                )
-                headers = {'Authorization': 'Token {token}'.format(token=pa_token)}
-                data = {
-                    "to": to_email,
-                    "subject": subject,
-                    "html": html_content
-                }
+                api_url = f'https://{host}/api/v0/user/{username}/cpu/'  # First test CPU endpoint
+                headers = {'Authorization': 'Token {}'.format(pa_token)}
                 
-                print("\nDebug: API request details:")
+                print("\nDebug: Testing API connection:")
                 print(f"URL: {api_url}")
                 print(f"Headers: {headers}")
-                print(f"Data keys: {list(data.keys())}")
                 
-                response = requests.post(api_url, headers=headers, json=data)
-                print(f"Response status: {response.status_code}")
-                print(f"Response text: {response.text}")
+                # Test CPU endpoint first
+                test_response = requests.get(api_url, headers=headers)
+                print(f"CPU test response status: {test_response.status_code}")
+                print(f"CPU test response text: {test_response.text}")
                 
-                if response.status_code != 200:
-                    raise Exception(f"API returned {response.status_code}: {response.text}")
+                if test_response.status_code == 200:
+                    print("\nAPI connection successful, attempting to send email...")
+                    # Now try to send the email
+                    data = {
+                        "to": to_email,
+                        "subject": subject,
+                        "html": html_content
+                    }
+                    
+                    print("\nDebug: Email API request details:")
+                    print(f"Data keys: {list(data.keys())}")
+                    
+                    response = requests.post(
+                        f'https://{host}/api/v0/user/{username}/mail/',
+                        headers=headers,
+                        json=data
+                    )
+                    print(f"Email response status: {response.status_code}")
+                    print(f"Email response text: {response.text}")
+                    
+                    if response.status_code != 200:
+                        raise Exception(f"API returned {response.status_code}: {response.text}")
+                else:
+                    raise Exception(f"API test failed with status {test_response.status_code}")
+                    
             except ImportError:
                 print("\nFalling back to simple email...")
                 # Simple fallback using sendmail
