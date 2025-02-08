@@ -1,0 +1,205 @@
+[
+  {
+    "name": "mont_blanc",
+    "inputs": {
+      "h1": 375,
+      "L0": 70,
+      "XZ": 4808,
+      "refraction_factor": 1.07
+    },
+    "api_result": {
+      "D1": 71.503,
+      "h2": 0.166,
+      "h3": 4807.834,
+      "CD": 4807.581,
+      "dip_angle": 0.601,
+      "perspective_scaled_height": 0.06868,
+      "is_visible": true,
+      "total_distance": 70
+    },
+    "local_result": {
+      "D1": 71.503,
+      "h2": 0.166,
+      "h3": 4807.834,
+      "CD": 4807.581,
+      "dip_angle": 0.601,
+      "perspective_scaled_height": 0.06868,
+      "is_visible": true,
+      "total_distance": 70
+    }
+  },
+  {
+    "name": "sea_level_observation",
+    "inputs": {
+      "h1": 2,
+      "L0": 10,
+      "XZ": 100,
+      "refraction_factor": 1.07
+    },
+    "api_result": {
+      "D1": 5.222,
+      "h2": 1.675,
+      "h3": 98.325,
+      "CD": 98.325,
+      "dip_angle": 0.044,
+      "perspective_scaled_height": 0.009833,
+      "is_visible": true,
+      "total_distance": 10
+    },
+    "local_result": {
+      "D1": 5.222,
+      "h2": 1.675,
+      "h3": 98.325,
+      "CD": 98.325,
+      "dip_angle": 0.044,
+      "perspective_scaled_height": 0.009833,
+      "is_visible": true,
+      "total_distance": 10
+    }
+  },
+  {
+    "name": "high_altitude",
+    "inputs": {
+      "h1": 5000,
+      "L0": 200,
+      "XZ": 6000,
+      "refraction_factor": 1.07
+    },
+    "api_result": {
+      "D1": 261.093,
+      "h2": 273.766,
+      "h3": 5726.234,
+      "CD": 5723.769,
+      "dip_angle": 2.194,
+      "perspective_scaled_height": 0.028619,
+      "is_visible": true,
+      "total_distance": 200
+    },
+    "local_result": {
+      "D1": 261.093,
+      "h2": 273.766,
+      "h3": 5726.234,
+      "CD": 5723.769,
+      "dip_angle": 2.194,
+      "perspective_scaled_height": 0.028619,
+      "is_visible": true,
+      "total_distance": 200
+    }
+  },
+  {
+    "name": "minimum_values",
+    "inputs": {
+      "h1": 2,
+      "L0": 5,
+      "XZ": 0,
+      "refraction_factor": 1.0
+    },
+    "api_result": {
+      "D1": 5.048,
+      "h2": 0.0,
+      "h3": 0,
+      "CD": 0.0,
+      "dip_angle": 0.045,
+      "perspective_scaled_height": 0.0,
+      "is_visible": false,
+      "total_distance": 5
+    },
+    "local_result": {
+      "D1": 5.048,
+      "h2": 0.0,
+      "h3": 0,
+      "CD": 0.0,
+      "dip_angle": 0.045,
+      "perspective_scaled_height": 0.0,
+      "is_visible": false,
+      "total_distance": 5
+    }
+  },
+  {
+    "name": "maximum_values",
+    "inputs": {
+      "h1": 9000,
+      "L0": 600,
+      "XZ": 9000,
+      "refraction_factor": 1.25
+    },
+    "api_result": {
+      "D1": 378.613,
+      "h2": 3078.209,
+      "h3": 5921.791,
+      "CD": 5904.992,
+      "dip_angle": 2.723,
+      "perspective_scaled_height": 0.009842,
+      "is_visible": true,
+      "total_distance": 600
+    },
+    "local_result": {
+      "D1": 378.613,
+      "h2": 3078.209,
+      "h3": 5921.791,
+      "CD": 5904.992,
+      "dip_angle": 2.723,
+      "perspective_scaled_height": 0.009842,
+      "is_visible": true,
+      "total_distance": 600
+    }
+  },
+  {
+    "name": "near_horizon",
+    "inputs": {
+      "h1": 100,
+      "L0": 35.7,
+      "XZ": 100,
+      "refraction_factor": 1.07
+    },
+    "api_result": {
+      "D1": 36.924,
+      "h2": 0.11,
+      "h3": 99.89,
+      "CD": 99.889,
+      "dip_angle": 0.31,
+      "perspective_scaled_height": 0.002798,
+      "is_visible": true,
+      "total_distance": 35.7
+    },
+    "local_result": {
+      "D1": 36.924,
+      "h2": 0.11,
+      "h3": 99.89,
+      "CD": 99.889,
+      "dip_angle": 0.31,
+      "perspective_scaled_height": 0.002798,
+      "is_visible": true,
+      "total_distance": 35.7
+    }
+  },
+  {
+    "name": "just_visible",
+    "inputs": {
+      "h1": 1000,
+      "L0": 150,
+      "XZ": 2000,
+      "refraction_factor": 1.07
+    },
+    "api_result": {
+      "D1": 116.764,
+      "h2": 81.019,
+      "h3": 1918.981,
+      "CD": 1918.516,
+      "dip_angle": 0.981,
+      "perspective_scaled_height": 0.01279,
+      "is_visible": true,
+      "total_distance": 150
+    },
+    "local_result": {
+      "D1": 116.764,
+      "h2": 81.019,
+      "h3": 1918.981,
+      "CD": 1918.516,
+      "dip_angle": 0.981,
+      "perspective_scaled_height": 0.01279,
+      "is_visible": true,
+      "total_distance": 150
+    }
+  }
+]

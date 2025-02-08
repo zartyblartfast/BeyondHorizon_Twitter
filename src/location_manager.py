@@ -2,6 +2,8 @@ import json
 import random
 import logging
 import requests
+import os
+import urllib.parse
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -23,6 +25,10 @@ class LocationManager:
         try:
             response = requests.get(self.url)
             response.raise_for_status()  # Raises an HTTPError for bad responses
+            
+            print("DEBUG: Raw response text:")
+            print(response.text[:500])  # Print first 500 chars to avoid overwhelming output
+            
             self.locations = response.json()
             self.last_update = datetime.now()
             logger.info(f"Loaded {len(self.locations['presets'])} locations from GitHub")
@@ -68,26 +74,85 @@ class LocationManager:
             idx = levels.index(closest)
             return f"{labels[idx]}({refraction:.2f})"
 
-    def format_tweet(self, location):
+    def format_tweet(self, location, format='normal'):
         """Format location data into a tweet"""
         # Get observer and target info
         observer = location['details']['location']['observer']
         target = location['details']['location']['target']
         
-        # Format the tweet content
-        tweet_lines = [
-            f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
-            f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km",
-            f"🌤️ Refraction: {self.format_refraction(location['refractionFactor'])}",
-            f"Full details & calculations: https://beyondhorizoncalc.com",
-            "#LongLineOfSight #BeyondHorizon"
-        ]
+        # Call API to get calculations
+        api_url = os.getenv('AZURE_FUNCTION_URL')
+        api_key = urllib.parse.unquote(os.getenv('AZURE_FUNCTION_KEY'))
         
-        # Add attribution if present
-        if location['details'].get('attribution'):
-            tweet_lines.append(f"📸 {location['details']['attribution']}")
+        calc_data = {
+            'observerHeight': location['observerHeight'],
+            'targetHeight': location['targetHeight'],
+            'distance': location['distance'],
+            'refractionFactor': location['refractionFactor'],
+            'isMetric': True
+        }
         
-        return "\n".join(tweet_lines)
+        try:
+            # Construct API URL and parameters
+            api_endpoint = f"{api_url}/api/calculate"
+            params = {'code': api_key}
+            
+            # Debug logging
+            logger.info("\nAPI Request Data:")
+            logger.info(json.dumps(calc_data, indent=2))
+            
+            response = requests.post(
+                api_endpoint,
+                params=params,
+                json=calc_data
+            )
+            response.raise_for_status()
+            results = response.json()
+            
+            # Debug logging
+            logger.info("\nAPI Response:")
+            logger.info(json.dumps(results, indent=2))
+            
+            # Format heights with 1 decimal place
+            hidden_height = f"{results['hidden_height']:.1f}"
+            visible_height = f"{results['visible_target_height']:.1f}"
+            
+            if format == 'compact':
+                # Compact format prioritizes calculation results
+                tweet_lines = [
+                    f"{observer['name']} → {target['name']}",
+                    f"📏 {location['distance']}km | 🌤️ Refr: {self.format_refraction(location['refractionFactor'])}",
+                    f"Hidden: {hidden_height}m | Visible: {visible_height}m",
+                    "#BeyondHorizon"
+                ]
+            else:
+                # Normal format includes more context
+                tweet_lines = [
+                    f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
+                    f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km | 🌤️ {self.format_refraction(location['refractionFactor'])}",
+                    f"📊 Hidden Height: {hidden_height}m | 👁️ Visible Height: {visible_height}m",
+                    f"Full details & calculations: https://beyondhorizoncalc.com",
+                    "#LongLineOfSight #BeyondHorizon"
+                ]
+            
+            # Add attribution if present and space permits
+            if location['details'].get('attribution'):
+                full_tweet = "\n".join(tweet_lines)
+                if len(full_tweet) + len(location['details']['attribution']) + 6 <= 280:  # 280 is Twitter's limit
+                    tweet_lines.append(f"📸 {location['details']['attribution']}")
+            
+            return "\n".join(tweet_lines)
+            
+        except Exception as e:
+            logger.error(f"Failed to get API calculations: {str(e)}")
+            # Fallback format without calculations
+            tweet_lines = [
+                f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
+                f"🌍 {observer['country']} to {target['country']} | 📏 {location['distance']}km",
+                f"🌤️ Refraction: {self.format_refraction(location['refractionFactor'])}",
+                "#LongLineOfSight #BeyondHorizon"
+            ]
+            return "\n".join(tweet_lines)
 
     def force_refresh(self):
         """Force a refresh of the location data"""

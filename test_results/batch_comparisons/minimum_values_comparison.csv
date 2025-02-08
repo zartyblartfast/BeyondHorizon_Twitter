@@ -1,0 +1,16 @@
+Metric,API Value,Local Value,Difference
+,,,
+Inputs:,,,
+Observer Height (h1),2,2,0
+Distance (L0),5,5,0
+Refraction Factor,1.0,1.0,0
+Target Height - optional (XZ),0,0,0
+,,,
+Results:,,,
+Distance to Horizon (D1),5.048,5.048,0.0
+Horizon Dip Angle,0.045,0.045,0.0
+"Hidden Height (h2, XC)",0.0,0.0,0.0
+Visible Height (h3),0,0,0
+Apparent Visible Height (CD),0.0,0.0,0.0
+Perspective Scaled Apparent Visible Height,0.0,0.0,0.0
+Target Visible,No,No,Match

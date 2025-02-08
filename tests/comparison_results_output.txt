@@ -1,0 +1,61 @@
+================================================================================
+Test Case: Mont Blanc Standard
+Parameters:
+  h1: 4808
+  L0: 100
+  XZ: 2000
+  refraction_factor: 1.07
+================================================================================
+
+Results Comparison:
+Field                     API Value            Local Value          Diff %    
+---------------------------------------------------------------------------
+CD                        1828405.000000       213.915000           100.0%    
+D1                        256.076000           256.031000           0.0%      
+dip_angle                 2.226000             2.151000             3.4%      
+h2                        171369.000000        1786.062000          99.0%     
+h3                        1828631.000000       213.938000           100.0%    
+is_visible                True                 True                 0.0%      
+perspective_scaled_height 18.105000            0.002139             100.0%    
+total_distance            100.000000           100                  0.0%      
+
+Analysis:
+- D1: Significant difference detected
+  API calculation: 256.076
+  Local calculation: 256.031
+- h2: Significant difference detected
+  API calculation: 171369.0
+  Local calculation: 1786.062
+- h3: Significant difference detected
+  API calculation: 1828631.0
+  Local calculation: 213.938
+
+================================================================================
+Test Case: Low Altitude
+Parameters:
+  h1: 10
+  L0: 10
+  XZ: 20
+  refraction_factor: 1.07
+================================================================================
+
+Results Comparison:
+Field                     API Value            Local Value          Diff %    
+---------------------------------------------------------------------------
+CD                        18286.000000         19.794000            99.9%     
+D1                        11.676000            11.676000            0.0%      
+dip_angle                 0.102000             0.098000             3.9%      
+h2                        1714.000000          0.206000             100.0%    
+h3                        18286.000000         19.794000            99.9%     
+is_visible                True                 True                 0.0%      
+perspective_scaled_height 1.662000             0.001979             99.9%     
+total_distance            10.000000            10                   0.0%      
+
+Analysis:
+- h2: Significant difference detected
+  API calculation: 1714.0
+  Local calculation: 0.206
+- h3: Significant difference detected
+  API calculation: 18286.0
+  Local calculation: 19.794
+

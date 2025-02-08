@@ -1,104 +1,162 @@
 # Quick Setup Guide
 
-This guide contains everything needed to recreate the BeyondHorizon Twitter bot from scratch.
+## Initial Setup
 
-## 1. Prerequisites
-1. **Twitter Developer Account**
-   - Create account at developer.twitter.com
-   - Apply for Elevated access
-   - Create new project and app
-   - Generate API keys and tokens with OAuth 1.0a
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/BeyondHorizon_Twitter.git
+   cd BeyondHorizon_Twitter
+   ```
 
-2. **Python Environment**
-   - Python 3.8+
-   - Virtual environment
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   
+   # Windows (Command Prompt)
+   .venv\Scripts\activate
+   
+   # Windows (PowerShell)
+   .\.venv\Scripts\Activate.ps1
+   
+   # Unix/MacOS
+   source .venv/bin/activate
+   ```
 
-## 2. Essential Files
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Project Structure
+4. Set up environment variables:
+   - Create a new file `config/.env` with the following structure:
+     ```
+     # Azure Functions API Configuration
+     AZURE_FUNCTION_URL=your_function_url_here
+     AZURE_FUNCTION_KEY=your_function_key_here
+
+     # Twitter API Configuration
+     TWITTER_API_KEY=your_api_key_here
+     TWITTER_API_SECRET=your_api_secret_here
+     TWITTER_ACCESS_TOKEN=your_access_token_here
+     TWITTER_ACCESS_SECRET=your_access_secret_here
+
+     # Development Settings
+     ENVIRONMENT=development  # or production
+     DEBUG=true
+     ```
+
+## Testing the Setup
+
+1. **Test Local Calculations**
+   ```bash
+   python src/curvature_calculator.py
+   ```
+   This runs basic validation tests for the local calculation engine.
+
+2. **Test API Integration**
+   ```bash
+   python src/test_single_location.py
+   ```
+   This tests the API with a single location (Fort Niagara to Toronto).
+
+3. **Run Batch Tests**
+   ```bash
+   python src/test_api_comparison.py
+   ```
+   This compares API and local calculations for all preset locations.
+
+4. **Test Tweet Generation (Dry Run)**
+   ```bash
+   # Show tweet preview without posting (using default preset)
+   python src/test_tweet.py --dry-run
+
+   # Test with specific preset location
+   python src/test_tweet.py --dry-run --preset "Mount Everest to Kanchenjunga"
+
+   # List all available presets
+   python src/test_tweet.py --list-presets
+
+   # Test with custom refraction factor
+   python src/test_tweet.py --dry-run --preset "K2 to Broad Peak" --refraction 1.15
+   ```
+
+## Project Structure
+
 ```
 BeyondHorizon_Twitter/
 ├── config/
-│   ├── .env                 # Twitter credentials
-│   └── config.template.env  # Template for .env
+│   └── .env               # Environment variables (not in git)
+├── docs/
+│   ├── quick_setup.md    # This guide
+│   └── batch_testing.md  # Detailed testing documentation
 ├── src/
-│   ├── location_manager.py  # Handles location data and tweet formatting
-│   ├── twitter_client.py    # Twitter API integration
-│   └── test_tweet.py       # Test script
-└── requirements.txt         # Python dependencies
+│   ├── curvature_calculator.py    # Core calculation engine
+│   ├── location_manager.py        # Location data management
+│   ├── test_api_comparison.py     # API vs local comparison
+│   └── test_single_location.py    # Single location API test
+└── requirements.txt          # Python dependencies
 ```
 
-### File Contents
+## Recent Updates
 
-1. **requirements.txt**
-```
-tweepy>=4.14.0
-python-dotenv>=1.0.0
-requests>=2.31.0
-```
+### Calculation Engine
+- Implemented core curvature calculations in `curvature_calculator.py`
+- Added support for:
+  - Hidden height calculation
+  - Horizon distance
+  - Dip angle
+  - Visible height
+  - Apparent height
+  - Perspective scaling
 
-2. **config/config.template.env**
-```
-TWITTER_API_KEY=your_api_key
-TWITTER_API_SECRET=your_api_secret
-TWITTER_ACCESS_TOKEN=your_access_token
-TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
-```
+### API Integration
+- Added Azure Function API integration
+- Implemented field mapping between API and local calculations
+- Added comprehensive error handling and validation
 
-## 3. Setup Steps
-1. Clone repository or create directory structure
-2. Copy `config.template.env` to `.env` and add Twitter credentials
-3. Create and activate virtual environment:
-   ```bash
-   # Create virtual environment
-   python -m venv venv
-   
-   # Activate virtual environment (choose one):
-   .\venv\Scripts\activate     # Windows PowerShell
-   .\venv\Scripts\activate.bat # Windows CMD
-   source venv/bin/activate    # Linux/Mac
-   
-   # Confirm activation - you should see (venv) in your prompt
-   # Example: (venv) PS C:\Users\username\BeyondHorizon_Twitter>
-   ```
-4. Install dependencies:
-   ```bash
-   # Make sure your virtual environment is activated (see step 3)
-   pip install -r requirements.txt
-   ```
-5. Run test:
-   ```bash
-   # Make sure your virtual environment is activated (see step 3)
-   
-   # Preview tweet without posting (dry run)
-   python src/test_tweet.py --dry-run
+### Testing Framework
+- Created test scripts for:
+  - Single location testing (`test_single_location.py`)
+  - Batch comparison testing (`test_api_comparison.py`)
+- Added CSV output for detailed comparisons
+- See `docs/batch_testing.md` for detailed testing instructions
 
-   # Post actual tweet
-   python src/test_tweet.py
-   ```
+## Current Status
 
-> **Important**: Always ensure your virtual environment is activated (you should see `(venv)` in your prompt) before running any Python commands. This isolates the project dependencies and prevents conflicts with your system Python packages.
+1. **Working Features**
+   - Local curvature calculations
+   - API integration
+   - Batch testing framework
+   - CSV comparison output
 
-## 4. Rate Limiting
-The Twitter API has rate limits that affect how frequently you can post:
-- Maximum 200 tweets per 3-hour window (about 1 tweet per minute)
-- Maximum 300 media uploads per 3-hour window
+2. **Under Verification**
+   - Calculation accuracy (comparing API vs local results)
+   - Real-world validation needed for:
+     - Hidden height calculations
+     - Visible height predictions
+     - Perspective scaling factors
 
-The script automatically handles rate limiting by:
-- Waiting 3 minutes between tweets to stay well within limits
-- Showing a countdown when waiting due to rate limits
-- Providing clear error messages if rate limits are hit
+3. **Next Steps**
+   - Validate calculations against real-world observations
+   - Resolve discrepancies between API and local calculations
+   - Add automated regression testing
+   - Implement command-line arguments for testing tools
 
-## 5. Key Features
-- Formats tweets with location details, distance, and refraction data
-- Supports up to 4 images per tweet
-- Preview mode (--dry-run) to review tweet content before posting
-- Automatic rate limit handling
-- Error handling for network and API issues
+## Troubleshooting
 
-## 6. Key Dependencies
-- Access to BeyondHorizonCalc presets.json for location data
-- Twitter API access for posting tweets
-- Python packages (tweepy, python-dotenv, requests)
+1. **API Connection Issues**
+   - Verify Azure Function URL and key in `.env`
+   - Check Azure Function status
+   - Review error messages in test output
 
-With just these components and the source code files, you can fully recreate the current functionality of posting formatted Long Line of Sight tweets.
+2. **Calculation Discrepancies**
+   - Check test output for detailed comparisons
+   - Focus on specific fields showing differences
+   - Compare with real-world observations when possible
+
+## Getting Help
+
+- Check the documentation in the `docs/` directory
+- Review test outputs for detailed error messages
+- Consult the Azure Function logs for API issues
+- Contact the development team for additional support

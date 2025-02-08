@@ -1,5 +1,5 @@
 # Environment variables
-.env
+# .env  # Temporarily commented out
 .venv
 env/
 venv/

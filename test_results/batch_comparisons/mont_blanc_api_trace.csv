@@ -1,0 +1,17 @@
+Step,Description,Formula,Inputs,Result
+1,Initial parameters,N/A,"{""h1"": 375, ""L0"": 70, ""XZ"": 4808, ""refraction_factor"": 1.07}",0.0
+2,Calculate effective radius (R),R = EARTH_RADIUS * refraction_factor,"{""EARTH_RADIUS"": 6371000, ""refraction_factor"": 1.07}",6816970.0
+3,Calculate horizon distance (d1),d1 = sqrt(2 * h1 * R),"{""h1"": 375, ""R"": 6816970.0}",71503.3390828708
+4,Calculate dip angle ratio,ratio = R / (R + h1),"{""R"": 6816970.0, ""h1"": 375}",0.9999449932488381
+5,Calculate dip angle,dip_angle = arccos(ratio) * (180/pi),"{""ratio"": 0.9999449932488381}",0.6009628399824621
+6,Convert distance to meters,distance_meters = distance_km * 1000,"{""distance_km"": 70.0}",70000
+7,Calculate Earth circumference (C),C = 2 * pi * R,"{""R"": 6816970.0}",42832285.74348402
+8,Calculate distance beyond horizon (l2),l2 = distance_meters - d1,"{""distance_meters"": 70000, ""d1"": 71503.3390828708}",-1503.339082870807
+9,Calculate box fraction,BOX_fraction = l2 / C,"{""l2"": -1503.339082870807, ""C"": 42832285.74348402}",-3.509826890570524e-05
+10,Calculate box angle,BOX_angle = 2 * pi * BOX_fraction,"{""BOX_fraction"": -3.509826890570524e-05}",-0.0002205289274957653
+11,Calculate observer to center distance (OC),OC = R / cos(BOX_angle),"{""R"": 6816970.0, ""BOX_angle"": -0.0002205289274957653}",6816970.165764881
+12,Calculate hidden height (h2),h2 = OC - R,"{""OC"": 6816970.165764881, ""R"": 6816970.0}",0.16576488129794598
+13,Calculate visible height (h3),"h3 = max(0, XZ - h2)","{""XZ"": 4808, ""h2"": 0.16576488129794598}",4807.834235118702
+14,Calculate viewing angle,angle = (L0 * 1000) / R,"{""L0"": 70, ""R"": 6816970.0}",0.010268491719928356
+15,Calculate apparent height (CD),CD = h3 * cos(angle),"{""h3"": 4807.834235118702, ""angle"": 0.010268491719928356}",4807.580763704233
+16,Calculate perspective scaled height,perspective_scaled = CD / (L0 * 1000),"{""CD"": 4807.580763704233, ""L0"": 70}",0.06867972519577475

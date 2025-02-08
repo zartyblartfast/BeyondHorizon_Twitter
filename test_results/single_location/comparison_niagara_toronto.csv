@@ -1,0 +1,10 @@
+Measurement,API Result,Local Result,Units,Notes
+Observer Height,2,2,meters,Standing at Fort Niagara State Park
+Target Height (CN Tower),533,533,meters,Height of CN Tower
+Total Distance,51,51,kilometers,Distance across Lake Ontario
+Horizon Distance,5.53,5.53,kilometers,How far until horizon drops away
+Hidden Height,42.53,135.22,meters,How much of target is hidden by Earth's curve
+Visible Height,490.47,397.78,meters,How much of target is visible above horizon
+Apparent Height,490.47,397.77,meters,How tall the target appears considering atmospheric effects
+Target Visible?,Yes,Yes,-,Can you see the CN Tower?
+Dip Angle,0.045,0.045,degrees,How much you need to look down to see horizon

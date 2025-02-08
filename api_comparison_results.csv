@@ -1,0 +1,14 @@
+location,observer_height,distance,target_height,refraction,status,differences
+Pic de Finstrelles to Pic Gaspard,2826,443,3883,1.2,Error: 'hidden_height',N/A
+Mount Dankova to Hindu Tagh,7015,539,6070,1.07,Error: 'hidden_height',N/A
+K2 to Broad Peak,8611,458,8051,1.07,Error: 'hidden_height',N/A
+Mount Everest to Kanchenjunga,8848,380,8586,1.07,Error: 'hidden_height',N/A
+Burnaby to Mount Rainier,190,280,4392,1.07,Error: 'hidden_height',N/A
+Fort Niagara State Park to Toronto,2,51,533,1.2,Error: 'hidden_height',N/A
+Alto Mora to Pico La Reina,3367,505,5535,1.15,Error: 'hidden_height',N/A
+Alto Mora to Pico Cristobal Colon,3367,502,5775,1.15,Error: 'hidden_height',N/A
+Kongur Tagh to Hindu Kush Peak,7649,500,5017,1.07,Error: 'hidden_height',N/A
+Cerro Paramillo to Pico La Reina,3724,491,5535,1.07,Error: 'hidden_height',N/A
+Cerro Paramillo to Pico Cristobal Colon,3724,484,5775,1.07,Error: 'hidden_height',N/A
+Kanchenjunga to Parasnath,8586,462,1360,1.07,Error: 'hidden_height',N/A
+Mount Everest to Parasnath,8848,455,1360,1.07,Error: 'hidden_height',N/A
