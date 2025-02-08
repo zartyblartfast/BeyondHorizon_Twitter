@@ -84,6 +84,14 @@ def send_email_report(report_content):
     # Get email configuration from environment
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
+    pa_token = os.getenv('PA_API_TOKEN')
+    
+    # Debug logging
+    print("\nDebug: Environment variables:")
+    print(f"FROM_EMAIL: {from_email}")
+    print(f"TO_EMAIL: {to_email}")
+    print(f"PA_API_TOKEN: {'Set' if pa_token else 'Not set'}")
+    print(f"PYTHONANYWHERE_SITE: {'Set' if 'PYTHONANYWHERE_SITE' in os.environ else 'Not set'}")
     
     # Create email subject
     subject = f'BeyondHorizon Tweet Report - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
