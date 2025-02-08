@@ -37,3 +37,6 @@ wheels/
 logs/
 *.log
 config/secrets.json
+
+# Development database
+data/tweet_history_development.db
