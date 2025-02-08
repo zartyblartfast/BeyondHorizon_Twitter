@@ -26,9 +26,6 @@ class LocationManager:
             response = requests.get(self.url)
             response.raise_for_status()  # Raises an HTTPError for bad responses
             
-            print("DEBUG: Raw response text:")
-            print(response.text[:500])  # Print first 500 chars to avoid overwhelming output
-            
             self.locations = response.json()
             self.last_update = datetime.now()
             logger.info(f"Loaded {len(self.locations['presets'])} locations from GitHub")
@@ -97,10 +94,6 @@ class LocationManager:
             api_endpoint = f"{api_url}/api/calculate"
             params = {'code': api_key}
             
-            # Debug logging
-            logger.info("\nAPI Request Data:")
-            logger.info(json.dumps(calc_data, indent=2))
-            
             response = requests.post(
                 api_endpoint,
                 params=params,
@@ -108,10 +101,6 @@ class LocationManager:
             )
             response.raise_for_status()
             results = response.json()
-            
-            # Debug logging
-            logger.info("\nAPI Response:")
-            logger.info(json.dumps(results, indent=2))
             
             # Format heights with 1 decimal place (using API field names)
             hidden_height = f"{results['h2']:.1f}"
@@ -177,10 +166,6 @@ class LocationManager:
         
         index = index % len(locations)
         location = locations[index]
-        
-        # Debug: Print full location data
-        logger.info("Full location data structure:")
-        logger.info(json.dumps(location, indent=2))
         
         return self.format_tweet(location)
 

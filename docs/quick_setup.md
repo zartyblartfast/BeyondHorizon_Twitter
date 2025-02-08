@@ -65,42 +65,71 @@
    ```
    This compares API and local calculations for all preset locations.
 
-4. **Test Tweet Generation (Dry Run)**
+4. **Test Tweet Generation**
    ```bash
-   # Show tweet preview without posting (using default preset)
-   python src/test_tweet.py --dry-run
+   # Show tweet preview without posting (using next preset in sequence)
+   python src/test_tweet_v2.py --dry-run
 
    # Test with specific preset location
-   python src/test_tweet.py --dry-run --preset "Mount Everest to Kanchenjunga"
+   python src/test_tweet_v2.py --dry-run --preset "Mount Everest to Kanchenjunga"
 
    # List all available presets
-   python src/test_tweet.py --list-presets
+   python src/test_tweet_v2.py --list-presets
 
-   # Test with custom refraction factor
-   python src/test_tweet.py --dry-run --preset "K2 to Broad Peak" --refraction 1.15
+   # View tweet history
+   python src/test_tweet_v2.py --show-history
+
+   # Test with random preset
+   python src/test_tweet_v2.py --dry-run --random
+
+   # Record test entries to database
+   python src/test_tweet_v2.py --dry-run --test-record
+
+   # Clear test history
+   python src/test_tweet_v2.py --clear-history
    ```
+
+5. **Test Database and Managers**
+   ```bash
+   python src/test_managers.py
+   ```
+   This tests PresetManager and ReportManager functionality.
 
 ## Project Structure
 
 ```
 BeyondHorizon_Twitter/
 ├── config/
-│   └── .env               # Environment variables (not in git)
+│   └── .env                  # Environment variables (not in git)
+├── data/
+│   └── tweet_history_*.db    # SQLite databases for different environments
 ├── docs/
-│   ├── quick_setup.md    # This guide
-│   └── batch_testing.md  # Detailed testing documentation
+│   ├── quick_setup.md       # This guide
+│   ├── preset_manager.md    # Preset management documentation
+│   └── batch_testing.md     # Detailed testing documentation
 ├── src/
 │   ├── curvature_calculator.py    # Core calculation engine
 │   ├── location_manager.py        # Location data management
-│   ├── test_api_comparison.py     # API vs local comparison
-│   └── test_single_location.py    # Single location API test
-└── requirements.txt          # Python dependencies
+│   ├── preset_manager.py          # Preset rotation and history
+│   ├── report_manager.py          # History reporting
+│   ├── tweet_db.py               # Database operations
+│   ├── test_tweet_v2.py          # Tweet testing and management
+│   ├── test_managers.py          # Database testing
+│   ├── test_api_comparison.py    # API vs local comparison
+│   └── test_single_location.py   # Single location API test
+└── requirements.txt              # Python dependencies
 ```
 
 ## Recent Updates
 
+### Preset Management System
+- Added SQLite database for tweet history tracking
+- Implemented preset rotation with 30-day cooldown
+- Added comprehensive testing tools
+- Created reporting system for tweet history
+
 ### Calculation Engine
-- Implemented core curvature calculations in `curvature_calculator.py`
+- Implemented core curvature calculations
 - Added support for:
   - Hidden height calculation
   - Horizon distance
@@ -116,47 +145,54 @@ BeyondHorizon_Twitter/
 
 ### Testing Framework
 - Created test scripts for:
-  - Single location testing (`test_single_location.py`)
-  - Batch comparison testing (`test_api_comparison.py`)
+  - Tweet generation and posting
+  - Preset management
+  - Database operations
+  - Single location testing
+  - Batch comparison testing
 - Added CSV output for detailed comparisons
-- See `docs/batch_testing.md` for detailed testing instructions
 
 ## Current Status
 
 1. **Working Features**
    - Local curvature calculations
    - API integration
+   - Tweet generation and testing
+   - Preset management and rotation
+   - History tracking and reporting
    - Batch testing framework
-   - CSV comparison output
 
-2. **Under Verification**
-   - Calculation accuracy (comparing API vs local results)
-   - Real-world validation needed for:
-     - Hidden height calculations
-     - Visible height predictions
-     - Perspective scaling factors
+2. **Under Development**
+   - Automated tweet scheduling
+   - Email reporting system
+   - Enhanced error handling
 
 3. **Next Steps**
-   - Validate calculations against real-world observations
-   - Resolve discrepancies between API and local calculations
-   - Add automated regression testing
-   - Implement command-line arguments for testing tools
+   - Implement automated scheduler
+   - Add email notifications
+   - Deploy to production environment
 
 ## Troubleshooting
 
-1. **API Connection Issues**
+1. **Database Issues**
+   - Check environment setting in `.env`
+   - Verify database file exists in `data/` directory
+   - Use `--clear-history` to reset test database
+   - Check file permissions
+
+2. **API Connection Issues**
    - Verify Azure Function URL and key in `.env`
    - Check Azure Function status
    - Review error messages in test output
 
-2. **Calculation Discrepancies**
-   - Check test output for detailed comparisons
-   - Focus on specific fields showing differences
-   - Compare with real-world observations when possible
+3. **Tweet Generation Issues**
+   - Use `--dry-run` to test without posting
+   - Check Twitter API credentials
+   - Review history with `--show-history`
 
 ## Getting Help
 
-- Check the documentation in the `docs/` directory
+- Check `docs/preset_manager.md` for detailed system documentation
 - Review test outputs for detailed error messages
-- Consult the Azure Function logs for API issues
+- Use `--list-presets` to verify available locations
 - Contact the development team for additional support
