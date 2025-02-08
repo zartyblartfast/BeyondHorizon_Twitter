@@ -1,4 +1,32 @@
-"""Test tweet generation and posting with database tracking"""
+"""
+BeyondHorizon Tweet Manager
+
+This script manages the automated tweeting system for BeyondHorizon:
+- Posts tweets with preset content and images
+- Manages tweet history in a SQLite database
+- Sends email reports after each tweet
+- Provides testing and dry-run capabilities
+
+Usage:
+    Regular tweet posting:
+    python tweet_manager.py
+
+    Test without posting:
+    python tweet_manager.py --dry-run
+
+    Just send email report:
+    python tweet_manager.py --email-report
+
+    List available presets:
+    python tweet_manager.py --list-presets
+
+    Show tweet history:
+    python tweet_manager.py --show-history
+
+Environment Variables Required:
+    - Twitter API credentials in .env
+    - Email settings in .env
+"""
 from location_manager import LocationManager
 from twitter_client import TwitterClient
 from preset_manager import PresetManager
@@ -9,6 +37,11 @@ import argparse
 import textwrap
 import random
 import os
+from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
 
 # Configure logging with a cleaner format
 logging.basicConfig(
@@ -38,52 +71,98 @@ def preview_tweet(tweet_content, image_urls=None):
 
 def get_db_path():
     """Get database path based on environment"""
+    load_dotenv()
     env = os.getenv('ENVIRONMENT', 'development')
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_name = f"tweet_history_{env}.db"
     return os.path.join(base_dir, 'data', db_name)
 
+def send_email_report(report_content):
+    """Send an email with the tweet history report."""
+    load_dotenv()
+    
+    # Get email configuration from environment
+    from_email = os.getenv('FROM_EMAIL')
+    to_email = os.getenv('TO_EMAIL')
+    
+    # Create message
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = f'BeyondHorizon Tweet Report - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
+    
+    # Convert the report to HTML format
+    html_content = f"""
+    <html>
+        <head>
+            <style>
+                table {{ border-collapse: collapse; width: 100%; }}
+                th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+                th {{ background-color: #f2f2f2; }}
+            </style>
+        </head>
+        <body>
+            <h2>BeyondHorizon Tweet History Report</h2>
+            <pre>{report_content}</pre>
+        </body>
+    </html>
+    """
+    
+    try:
+        # Check if we're on PythonAnywhere
+        if 'PYTHONANYWHERE_DOMAIN' in os.environ:
+            # Use PythonAnywhere's built-in email service
+            from pythonanywhere.email import send_email
+            send_email(
+                to_email,
+                from_email,
+                msg['Subject'],
+                html_content,
+                html=True
+            )
+        else:
+            # For local testing, just print the email
+            print("\nEmail would be sent with following content:")
+            print(f"From: {from_email}")
+            print(f"To: {to_email}")
+            print(f"Subject: {msg['Subject']}")
+            print("\nContent:")
+            print(html_content)
+            
+        print("\nEmail report handled successfully")
+    except Exception as e:
+        print(f"\nError handling email report: {str(e)}")
+
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Test tweet generation and posting with various parameters',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent('''
-            Examples:
-              # Dry run with next preset in sequence
-              python test_tweet_v2.py --dry-run
-              
-              # Post specific preset
-              python test_tweet_v2.py --preset "Mount Everest to Kanchenjunga"
-              
-              # List all available presets
-              python test_tweet_v2.py --list-presets
-              
-              # Show recent tweet history
-              python test_tweet_v2.py --show-history
-              
-              # Test with custom refraction (Note: Requires Azure Functions API)
-              python test_tweet_v2.py --dry-run --preset "K2 to Broad Peak" --refraction 1.15
-        ''')
+        description='BeyondHorizon Tweet Manager - Posts tweets, manages history, and sends reports'
     )
     
-    # Test control arguments
-    parser.add_argument('--dry-run', action='store_true', 
-                       help='Show tweet content without posting')
-    parser.add_argument('--list-presets', action='store_true',
-                       help='List all available presets and exit')
-    parser.add_argument('--show-history', action='store_true',
-                       help='Show recent tweet history and exit')
-    parser.add_argument('--test-record', action='store_true',
-                       help='Record dry run to database (for testing only)')
-    parser.add_argument('--clear-history', action='store_true',
-                       help='Clear all tweet history (for testing only)')
+    # Operation modes
+    mode_group = parser.add_argument_group('Operation Modes')
+    mode_group.add_argument('--dry-run', action='store_true', 
+                          help='Show tweet content without posting')
+    mode_group.add_argument('--email-report', action='store_true',
+                          help='Just send the email report without posting')
+    mode_group.add_argument('--list-presets', action='store_true',
+                          help='List all available presets and exit')
+    mode_group.add_argument('--show-history', action='store_true',
+                          help='Show recent tweet history and exit')
     
-    # Content selection arguments
-    parser.add_argument('--preset', 
-                       help='Name of preset to use (default: next in sequence)')
-    parser.add_argument('--random', action='store_true',
-                       help='Use a random preset')
+    # Content selection
+    content_group = parser.add_argument_group('Content Selection')
+    content_group.add_argument('--preset', 
+                             help='Use specific preset instead of next in sequence')
+    content_group.add_argument('--random', action='store_true',
+                             help='Use random preset')
+    
+    # Testing and maintenance
+    test_group = parser.add_argument_group('Testing and Maintenance')
+    test_group.add_argument('--test-record', action='store_true',
+                          help='Record dry run to database (for testing only)')
+    test_group.add_argument('--clear-history', action='store_true',
+                          help='Clear all tweet history (for testing only)')
     
     # Tweet customization arguments
     parser.add_argument('--refraction', type=float,
@@ -124,6 +203,14 @@ def main():
     # Show history if requested
     if args.show_history:
         print(report_manager.generate_report())
+        return
+    
+    # Just show email report if requested
+    if args.email_report:
+        print("\nGenerating email report...")
+        report = report_manager.generate_report()
+        print("\nAttempting to send email report...")
+        send_email_report(report)
         return
     
     # Get all locations for listing
@@ -180,9 +267,9 @@ def main():
             print("Recorded test entry to database")
         return
         
-    # Post the tweet
-    print("\nPosting tweet...")
     try:
+        # Post the tweet
+        print("\nPosting tweet...")
         tweet_id = twitter_client.post_tweet(tweet_content, image_urls)
         if tweet_id:
             # Record successful tweet
@@ -214,6 +301,13 @@ def main():
             error_message=str(e)
         )
         print(f"\nError posting tweet: {str(e)}")
+
+    # After successful tweet or dry run, send email report if not in test mode
+    print("\nGenerating email report...")
+    report = report_manager.generate_report()
+    if not args.test_record:  # Don't send emails during testing
+        print("\nAttempting to send email report...")
+        send_email_report(report)
 
 if __name__ == "__main__":
     main()
