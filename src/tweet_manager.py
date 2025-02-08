@@ -79,12 +79,20 @@ def get_db_path():
 
 def send_email_report(report_content):
     """Send an email with the tweet history report."""
-    load_dotenv()
+    # Debug: Print current working directory and env file location
+    print(f"\nDebug: Current working directory: {os.getcwd()}")
+    env_path = os.path.join(os.getcwd(), 'config', '.env')
+    print(f"Debug: Looking for .env file at: {env_path}")
+    print(f"Debug: .env file exists: {os.path.exists(env_path)}")
+    
+    # Load environment variables
+    load_dotenv(env_path)
     
     # Get email configuration from environment
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
     pa_token = os.getenv('PA_API_TOKEN')
+    username = 'BeyondHorizon'  # Your PythonAnywhere username
     
     # Debug logging
     print("\nDebug: Environment variables:")
@@ -128,8 +136,10 @@ def send_email_report(report_content):
                 import requests
                 
                 # Debug API request
-                api_url = "https://api.pythonanywhere.com/api/v0/user/BeyondHorizon/mail/"
-                headers = {"Authorization": f"Token {pa_token}"}
+                api_url = 'https://www.pythonanywhere.com/api/v0/user/{username}/mail/'.format(
+                    username=username
+                )
+                headers = {'Authorization': 'Token {token}'.format(token=pa_token)}
                 data = {
                     "to": to_email,
                     "subject": subject,
