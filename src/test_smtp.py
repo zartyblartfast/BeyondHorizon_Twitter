@@ -4,6 +4,7 @@ This script tests Gmail SMTP connection with verbose debugging enabled.
 """
 import os
 import smtplib
+import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -20,6 +21,11 @@ def test_smtp_connection():
     to_email = os.getenv('TO_EMAIL')
     app_password = os.getenv('EMAIL_PASSWORD')
 
+    # Validate Gmail address
+    if not from_email or not from_email.endswith('@gmail.com'):
+        print(f"\nError: FROM_EMAIL must be a Gmail address. Current value: {from_email}")
+        return
+
     # Print debug info (without showing the full password)
     print("\nConfiguration:")
     print(f"From Email: {from_email}")
@@ -29,10 +35,10 @@ def test_smtp_connection():
 
     # Create a simple test message
     msg = MIMEMultipart()
-    msg['Subject'] = 'SMTP Test Email'
+    msg['Subject'] = 'Gmail SMTP Test Email'
     msg['From'] = from_email
     msg['To'] = to_email
-    msg.attach(MIMEText('This is a test email to verify SMTP connection.', 'plain'))
+    msg.attach(MIMEText('This is a test email to verify Gmail SMTP connection.', 'plain'))
 
     # Gmail SMTP settings
     smtp_server = "smtp.gmail.com"
@@ -42,20 +48,33 @@ def test_smtp_connection():
         print("\nStarting SMTP connection test...")
         print(f"1. Creating SMTP connection to {smtp_server}:{smtp_port}")
         
-        # Enable debug mode
+        # Create SMTP object with debugging
         smtp = smtplib.SMTP(smtp_server, smtp_port)
         smtp.set_debuglevel(2)  # Enable verbose debugging
         
         print("\n2. Starting TLS...")
-        smtp.starttls()
+        smtp.starttls(context=ssl.create_default_context())
         
         print("\n3. Attempting login...")
+        if not app_password:
+            raise ValueError("EMAIL_PASSWORD not found in .env file")
+        
         smtp.login(from_email, app_password)
         
         print("\n4. Sending test email...")
         smtp.send_message(msg)
         
         print("\nSuccess! SMTP connection and authentication working correctly.")
+        
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"\nAuthentication Error: {str(e)}")
+        print("This usually means:")
+        print("1. The app password is incorrect")
+        print("2. 2-Step Verification might not be properly enabled")
+        print("3. The app password might need to be regenerated")
+        
+    except ValueError as e:
+        print(f"\nConfiguration Error: {str(e)}")
         
     except Exception as e:
         print(f"\nError occurred: {str(e)}")
