@@ -1,9 +1,7 @@
 """
-Email Test Script using PythonAnywhere API
-This script tests sending email using PythonAnywhere's API.
+Email Test Script using PythonAnywhere's mail module
 """
 import os
-import requests
 from dotenv import load_dotenv
 
 def test_email():
@@ -20,49 +18,39 @@ def test_email():
     # Get configuration
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
-    pa_token = os.getenv('PA_API_TOKEN')
 
     print("\n=== Configuration ===")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
-    print(f"PA_API_TOKEN set: {'Yes' if pa_token else 'No'}")
 
-    if not all([from_email, to_email, pa_token]):
+    if not all([from_email, to_email]):
         print("\nError: Missing required environment variables.")
-        print("Make sure FROM_EMAIL, TO_EMAIL, and PA_API_TOKEN are set in .env")
+        print("Make sure FROM_EMAIL and TO_EMAIL are set in .env")
         return
-
-    # PythonAnywhere API endpoint
-    api_url = "https://www.pythonanywhere.com/api/v0/user/{username}/emails/"
-    username = "BeyondHorizon"  # Your PythonAnywhere username
-
-    # Headers for authentication
-    headers = {'Authorization': f'Token {pa_token}'}
-
-    # Email content
-    data = {
-        'subject': 'Test Email via PythonAnywhere API',
-        'to': to_email,
-        'from': from_email,
-        'text': 'This is a test email sent using the PythonAnywhere API.'
-    }
 
     try:
         print("\n=== Sending Email ===")
-        print("1. Making API request...")
+        print("1. Importing mail module...")
         
-        response = requests.post(
-            api_url.format(username=username),
-            headers=headers,
-            json=data
+        # Import PythonAnywhere's mail module
+        from pythonanywhere.mail import Mailer
+        
+        print("2. Creating mailer...")
+        mailer = Mailer()
+        
+        print("3. Sending email...")
+        mailer.send(
+            to_email,
+            subject="Test Email from PythonAnywhere",
+            text="This is a test email sent using PythonAnywhere's mail module.",
+            from_email=from_email
         )
         
-        if response.status_code == 201:
-            print("\nSuccess! Email sent successfully.")
-        else:
-            print(f"\nError: API request failed with status code {response.status_code}")
-            print(f"Response: {response.text}")
+        print("\nSuccess! Email sent successfully.")
             
+    except ImportError:
+        print("\nError: Could not import pythonanywhere.mail module.")
+        print("This script must be run on PythonAnywhere's servers.")
     except Exception as e:
         print(f"\nError occurred: {str(e)}")
         print(f"Error type: {type(e).__name__}")
