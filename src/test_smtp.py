@@ -1,6 +1,6 @@
 """
-Yahoo SMTP Connection Test Script
-This script tests Yahoo SMTP connection with debugging enabled.
+SMTP Connection Test Script for PythonAnywhere
+This script tests SMTP connection using PythonAnywhere's mail server.
 """
 import os
 import smtplib
@@ -42,20 +42,15 @@ def test_smtp_connection():
     if app_password:
         print(f"EMAIL_PASSWORD length: {len(app_password)}")
 
-    # Validate Yahoo address
-    if not from_email or not from_email.endswith('@yahoo.com'):
-        print(f"\nError: FROM_EMAIL must be a Yahoo address. Current value: {from_email}")
-        return
-
     # Create a simple test message
     msg = MIMEMultipart()
-    msg['Subject'] = 'Yahoo SMTP Test Email'
+    msg['Subject'] = 'PythonAnywhere SMTP Test Email'
     msg['From'] = from_email
     msg['To'] = to_email
-    msg.attach(MIMEText('This is a test email to verify Yahoo SMTP connection.', 'plain'))
+    msg.attach(MIMEText('This is a test email using PythonAnywhere\'s SMTP server.', 'plain'))
 
-    # Yahoo SMTP settings
-    smtp_server = "smtp.mail.yahoo.com"
+    # PythonAnywhere SMTP settings
+    smtp_server = "smtp.pythonanywhere.com"
     smtp_port = 587
 
     try:
@@ -82,8 +77,8 @@ def test_smtp_connection():
     except smtplib.SMTPAuthenticationError as e:
         print(f"\nAuthentication Error: {str(e)}")
         print("This usually means:")
-        print("1. The app password is incorrect")
-        print("2. The app password might need to be regenerated")
+        print("1. The password is incorrect")
+        print("2. Make sure you're using your Yahoo account password (not an app password)")
         
     except ValueError as e:
         print(f"\nConfiguration Error: {str(e)}")
