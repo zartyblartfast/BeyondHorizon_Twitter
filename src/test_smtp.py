@@ -3,7 +3,7 @@ Email Test Script using MailerSend
 """
 import os
 from mailersend import emails
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 
 def test_email():
     print("\n=== Environment Debug Info ===")
@@ -23,21 +23,23 @@ def test_email():
         print(f"Error reading .env file: {e}")
     
     print("\n3. Loading environment variables...")
+    # Try both methods of loading env vars
+    config = dotenv_values(env_path)
     load_dotenv(env_path)
     
-    # Get configuration
-    from_email = os.getenv('FROM_EMAIL')
-    to_email = os.getenv('TO_EMAIL')
-    api_key = os.getenv('MAILERSEND_API_KEY')
+    # Get configuration (try both env and config)
+    from_email = os.getenv('FROM_EMAIL') or config.get('FROM_EMAIL')
+    to_email = os.getenv('TO_EMAIL') or config.get('TO_EMAIL')
+    api_key = os.getenv('MAILERSEND_API_KEY') or config.get('MAILERSEND_API_KEY')
 
     print("\n=== Configuration ===")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
     print(f"MAILERSEND_API_KEY: {'[HIDDEN]' if api_key else 'Not set'}")
     
-    # Print all env vars for debugging
-    print("\nAll environment variables:")
-    for key, value in os.environ.items():
+    # Print all loaded values from .env
+    print("\nLoaded .env values:")
+    for key, value in config.items():
         if 'KEY' in key or 'TOKEN' in key or 'SECRET' in key:
             print(f"{key}: [HIDDEN]")
         else:
