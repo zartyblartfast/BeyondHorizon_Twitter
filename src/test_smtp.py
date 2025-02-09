@@ -10,28 +10,42 @@ from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
 def test_smtp_connection():
+    print("\n=== Environment Debug Info ===")
+    
+    # Check raw env variables before loading .env
+    print("\n1. Before loading .env:")
+    email_vars = {k: v for k, v in os.environ.items() if 'EMAIL' in k.upper()}
+    print(f"Email-related env vars: {email_vars}")
+    
     # Load environment variables
     script_dir = os.path.dirname(os.path.abspath(__file__))
     env_path = os.path.join(os.path.dirname(script_dir), 'config', '.env')
-    print(f"\nDebug: Looking for .env file at: {env_path}")
+    print(f"\n2. Loading .env from: {env_path}")
+    print(f"File exists: {os.path.exists(env_path)}")
+    
     load_dotenv(env_path)
-
+    
+    # Check env variables after loading .env
+    print("\n3. After loading .env:")
+    email_vars = {k: v for k, v in os.environ.items() if 'EMAIL' in k.upper()}
+    print(f"Email-related env vars: {email_vars}")
+    
     # Get credentials from environment
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
     app_password = os.getenv('EMAIL_PASSWORD')
 
+    print("\n=== Configuration ===")
+    print(f"FROM_EMAIL: {from_email}")
+    print(f"TO_EMAIL: {to_email}")
+    print(f"EMAIL_PASSWORD set: {'Yes' if app_password else 'No'}")
+    if app_password:
+        print(f"EMAIL_PASSWORD length: {len(app_password)}")
+
     # Validate Gmail address
     if not from_email or not from_email.endswith('@gmail.com'):
         print(f"\nError: FROM_EMAIL must be a Gmail address. Current value: {from_email}")
         return
-
-    # Print debug info (without showing the full password)
-    print("\nConfiguration:")
-    print(f"From Email: {from_email}")
-    print(f"To Email: {to_email}")
-    print(f"App Password Set: {'Yes' if app_password else 'No'}")
-    print(f"App Password Length: {len(app_password) if app_password else 0}")
 
     # Create a simple test message
     msg = MIMEMultipart()
@@ -45,26 +59,25 @@ def test_smtp_connection():
     smtp_port = 587
 
     try:
-        print("\nStarting SMTP connection test...")
-        print(f"1. Creating SMTP connection to {smtp_server}:{smtp_port}")
+        print("\n=== SMTP Connection Test ===")
+        print(f"1. Connecting to {smtp_server}:{smtp_port}")
         
-        # Create SMTP object with debugging
         smtp = smtplib.SMTP(smtp_server, smtp_port)
-        smtp.set_debuglevel(2)  # Enable verbose debugging
+        smtp.set_debuglevel(1)  # Reduced debug level
         
-        print("\n2. Starting TLS...")
+        print("2. Starting TLS...")
         smtp.starttls(context=ssl.create_default_context())
         
-        print("\n3. Attempting login...")
+        print("3. Attempting login...")
         if not app_password:
             raise ValueError("EMAIL_PASSWORD not found in .env file")
         
         smtp.login(from_email, app_password)
+        print("Login successful!")
         
-        print("\n4. Sending test email...")
+        print("4. Sending test email...")
         smtp.send_message(msg)
-        
-        print("\nSuccess! SMTP connection and authentication working correctly.")
+        print("Email sent successfully!")
         
     except smtplib.SMTPAuthenticationError as e:
         print(f"\nAuthentication Error: {str(e)}")
