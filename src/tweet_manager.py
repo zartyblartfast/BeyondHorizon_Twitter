@@ -90,15 +90,14 @@ def send_email_report(report_content):
     load_dotenv(env_path)
     
     # Get email configuration from environment
-    from_email = os.getenv('FROM_EMAIL')
+    from_email = 'longlineofsight@gmail.com'  # Dedicated email account
     to_email = os.getenv('TO_EMAIL')
-    sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
+    email_password = 'Saturday123!'
     
     # Debug logging
     print("\nDebug: Environment variables:")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
-    print(f"SENDGRID_API_KEY: {'Set' if sendgrid_api_key else 'Not set'}")
     print(f"PYTHONANYWHERE_SITE: {'Set' if 'PYTHONANYWHERE_SITE' in os.environ else 'Not set'}")
     
     # Create email subject
@@ -131,45 +130,38 @@ def send_email_report(report_content):
             print("\nContent:")
             print(html_content)
         else:
-            # On PythonAnywhere, use SendGrid API
+            # On PythonAnywhere, use Gmail SMTP
             try:
-                import requests
+                import smtplib
+                from email.mime.text import MIMEText
+                from email.mime.multipart import MIMEMultipart
                 
-                # SendGrid API endpoint
-                url = 'https://api.sendgrid.com/v3/mail/send'
-                headers = {
-                    'Authorization': f'Bearer {sendgrid_api_key}',
-                    'Content-Type': 'application/json'
-                }
+                # Gmail SMTP settings
+                smtp_server = "smtp.gmail.com"
+                smtp_port = 587
                 
-                # Prepare email data
-                data = {
-                    'personalizations': [{
-                        'to': [{'email': to_email}]
-                    }],
-                    'from': {'email': from_email},
-                    'subject': subject,
-                    'content': [{
-                        'type': 'text/html',
-                        'value': html_content
-                    }]
-                }
+                # Create message
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = subject
+                msg['From'] = from_email
+                msg['To'] = to_email
+                msg.attach(MIMEText(html_content, 'html'))
                 
-                print("\nDebug: Sending email via SendGrid API...")
-                response = requests.post(url, headers=headers, json=data)
-                print(f"SendGrid response status: {response.status_code}")
-                
-                if response.status_code >= 400:
-                    print(f"SendGrid response text: {response.text}")
-                    raise Exception(f"SendGrid API returned {response.status_code}")
-                else:
-                    print("Email sent successfully via SendGrid")
+                print("\nDebug: Connecting to Gmail SMTP...")
+                # Send email
+                with smtplib.SMTP(smtp_server, smtp_port) as server:
+                    server.starttls()
+                    print("Debug: Attempting login...")
+                    server.login(from_email, email_password)
+                    print("Debug: Sending message...")
+                    server.send_message(msg)
+                print("Email sent successfully via Gmail SMTP")
                     
             except ImportError as e:
-                print(f"\nError importing requests: {str(e)}")
+                print(f"\nError importing email modules: {str(e)}")
                 raise
             except Exception as e:
-                print(f"\nError sending via SendGrid: {str(e)}")
+                print(f"\nError sending via Gmail SMTP: {str(e)}")
                 raise
             
         print("\nEmail report handled successfully")
