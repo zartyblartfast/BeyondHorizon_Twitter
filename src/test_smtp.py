@@ -1,7 +1,8 @@
 """
-Email Test Script using PythonAnywhere's mail module
+Email Test Script using MailerSend
 """
 import os
+from mailersend import emails
 from dotenv import load_dotenv
 
 def test_email():
@@ -18,39 +19,49 @@ def test_email():
     # Get configuration
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
+    api_key = os.getenv('MAILERSEND_API_KEY')
 
     print("\n=== Configuration ===")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
+    print(f"MAILERSEND_API_KEY set: {'Yes' if api_key else 'No'}")
 
-    if not all([from_email, to_email]):
+    if not all([from_email, to_email, api_key]):
         print("\nError: Missing required environment variables.")
-        print("Make sure FROM_EMAIL and TO_EMAIL are set in .env")
+        print("Make sure FROM_EMAIL, TO_EMAIL, and MAILERSEND_API_KEY are set in .env")
         return
 
     try:
         print("\n=== Sending Email ===")
-        print("1. Importing mail module...")
+        print("1. Setting up MailerSend client...")
         
-        # Import PythonAnywhere's mail module
-        from pythonanywhere.mail import Mailer
-        
-        print("2. Creating mailer...")
-        mailer = Mailer()
-        
-        print("3. Sending email...")
-        mailer.send(
-            to_email,
-            subject="Test Email from PythonAnywhere",
-            text="This is a test email sent using PythonAnywhere's mail module.",
-            from_email=from_email
-        )
-        
-        print("\nSuccess! Email sent successfully.")
+        # Initialize mailer object
+        mailer = emails.NewEmail(api_key)
+
+        # Prepare email data
+        recipients = [{"email": to_email}]
+        mail_from = {
+            "email": from_email,
+            "name": "BeyondHorizon Bot"
+        }
+
+        print("2. Sending email...")
+        # Send email
+        response = mailer.send({
+            "from": mail_from,
+            "to": recipients,
+            "subject": "Test Email from MailerSend",
+            "text": "This is a test email sent using MailerSend.",
+            "html": "<p>This is a test email sent using MailerSend.</p>"
+        })
+
+        if response.status_code == 202:
+            print("\nSuccess! Email sent successfully.")
+            print(f"Message ID: {response.headers.get('x-message-id')}")
+        else:
+            print(f"\nError: Failed to send email. Status code: {response.status_code}")
+            print(f"Response: {response.text}")
             
-    except ImportError:
-        print("\nError: Could not import pythonanywhere.mail module.")
-        print("This script must be run on PythonAnywhere's servers.")
     except Exception as e:
         print(f"\nError occurred: {str(e)}")
         print(f"Error type: {type(e).__name__}")
