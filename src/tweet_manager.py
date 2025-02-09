@@ -92,15 +92,13 @@ def send_email_report(report_content):
     # Get email configuration from environment
     from_email = os.getenv('FROM_EMAIL')
     to_email = os.getenv('TO_EMAIL')
-    pa_token = os.getenv('PA_API_TOKEN')
-    username = 'BeyondHorizon'  # Your PythonAnywhere username
-    host = 'www.pythonanywhere.com'  # or 'eu.pythonanywhere.com' if you're on EU servers
+    sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
     
     # Debug logging
     print("\nDebug: Environment variables:")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
-    print(f"PA_API_TOKEN: {'Set' if pa_token else 'Not set'}")
+    print(f"SENDGRID_API_KEY: {'Set' if sendgrid_api_key else 'Not set'}")
     print(f"PYTHONANYWHERE_SITE: {'Set' if 'PYTHONANYWHERE_SITE' in os.environ else 'Not set'}")
     
     # Create email subject
@@ -133,59 +131,46 @@ def send_email_report(report_content):
             print("\nContent:")
             print(html_content)
         else:
-            # On PythonAnywhere, use their API
+            # On PythonAnywhere, use SendGrid API
             try:
                 import requests
                 
-                # Debug API request
-                api_url = f'https://{host}/api/v0/user/{username}/cpu/'  # First test CPU endpoint
-                headers = {'Authorization': 'Token {}'.format(pa_token)}
+                # SendGrid API endpoint
+                url = 'https://api.sendgrid.com/v3/mail/send'
+                headers = {
+                    'Authorization': f'Bearer {sendgrid_api_key}',
+                    'Content-Type': 'application/json'
+                }
                 
-                print("\nDebug: Testing API connection:")
-                print(f"URL: {api_url}")
-                print(f"Headers: {headers}")
+                # Prepare email data
+                data = {
+                    'personalizations': [{
+                        'to': [{'email': to_email}]
+                    }],
+                    'from': {'email': from_email},
+                    'subject': subject,
+                    'content': [{
+                        'type': 'text/html',
+                        'value': html_content
+                    }]
+                }
                 
-                # Test CPU endpoint first
-                test_response = requests.get(api_url, headers=headers)
-                print(f"CPU test response status: {test_response.status_code}")
-                print(f"CPU test response text: {test_response.text}")
+                print("\nDebug: Sending email via SendGrid API...")
+                response = requests.post(url, headers=headers, json=data)
+                print(f"SendGrid response status: {response.status_code}")
                 
-                if test_response.status_code == 200:
-                    print("\nAPI connection successful, attempting to send email...")
-                    # Now try to send the email
-                    data = {
-                        "to": to_email,
-                        "subject": subject,
-                        "html": html_content
-                    }
-                    
-                    print("\nDebug: Email API request details:")
-                    print(f"Data keys: {list(data.keys())}")
-                    
-                    response = requests.post(
-                        f'https://{host}/api/v0/user/{username}/mail/',
-                        headers=headers,
-                        json=data
-                    )
-                    print(f"Email response status: {response.status_code}")
-                    print(f"Email response text: {response.text}")
-                    
-                    if response.status_code != 200:
-                        raise Exception(f"API returned {response.status_code}: {response.text}")
+                if response.status_code >= 400:
+                    print(f"SendGrid response text: {response.text}")
+                    raise Exception(f"SendGrid API returned {response.status_code}")
                 else:
-                    raise Exception(f"API test failed with status {test_response.status_code}")
+                    print("Email sent successfully via SendGrid")
                     
-            except ImportError:
-                print("\nFalling back to simple email...")
-                # Simple fallback using sendmail
-                import subprocess
-                msg = f"To: {to_email}\nFrom: {from_email}\nSubject: {subject}\nContent-Type: text/html\n\n{html_content}"
-                try:
-                    p = subprocess.Popen(["/usr/sbin/sendmail", "-t"], stdin=subprocess.PIPE)
-                    p.communicate(msg.encode())
-                except Exception as e:
-                    print(f"Sendmail error: {str(e)}")
-                    raise
+            except ImportError as e:
+                print(f"\nError importing requests: {str(e)}")
+                raise
+            except Exception as e:
+                print(f"\nError sending via SendGrid: {str(e)}")
+                raise
             
         print("\nEmail report handled successfully")
     except Exception as e:
