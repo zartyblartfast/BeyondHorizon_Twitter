@@ -1,6 +1,6 @@
 """
-Gmail SMTP Connection Test Script
-This script tests Gmail SMTP connection with verbose debugging enabled.
+Yahoo SMTP Connection Test Script
+This script tests Yahoo SMTP connection with debugging enabled.
 """
 import os
 import smtplib
@@ -42,20 +42,20 @@ def test_smtp_connection():
     if app_password:
         print(f"EMAIL_PASSWORD length: {len(app_password)}")
 
-    # Validate Gmail address
-    if not from_email or not from_email.endswith('@gmail.com'):
-        print(f"\nError: FROM_EMAIL must be a Gmail address. Current value: {from_email}")
+    # Validate Yahoo address
+    if not from_email or not from_email.endswith('@yahoo.com'):
+        print(f"\nError: FROM_EMAIL must be a Yahoo address. Current value: {from_email}")
         return
 
     # Create a simple test message
     msg = MIMEMultipart()
-    msg['Subject'] = 'Gmail SMTP Test Email'
+    msg['Subject'] = 'Yahoo SMTP Test Email'
     msg['From'] = from_email
     msg['To'] = to_email
-    msg.attach(MIMEText('This is a test email to verify Gmail SMTP connection.', 'plain'))
+    msg.attach(MIMEText('This is a test email to verify Yahoo SMTP connection.', 'plain'))
 
-    # Gmail SMTP settings
-    smtp_server = "smtp.gmail.com"
+    # Yahoo SMTP settings
+    smtp_server = "smtp.mail.yahoo.com"
     smtp_port = 587
 
     try:
@@ -83,8 +83,7 @@ def test_smtp_connection():
         print(f"\nAuthentication Error: {str(e)}")
         print("This usually means:")
         print("1. The app password is incorrect")
-        print("2. 2-Step Verification might not be properly enabled")
-        print("3. The app password might need to be regenerated")
+        print("2. The app password might need to be regenerated")
         
     except ValueError as e:
         print(f"\nConfiguration Error: {str(e)}")
