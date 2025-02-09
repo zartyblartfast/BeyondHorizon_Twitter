@@ -14,6 +14,15 @@ def test_email():
     print(f"\n1. Loading .env from: {env_path}")
     print(f"File exists: {os.path.exists(env_path)}")
     
+    # Print raw file contents for debugging
+    print("\n2. Raw .env file contents:")
+    try:
+        with open(env_path, 'r') as f:
+            print(f.read())
+    except Exception as e:
+        print(f"Error reading .env file: {e}")
+    
+    print("\n3. Loading environment variables...")
     load_dotenv(env_path)
     
     # Get configuration
@@ -24,7 +33,15 @@ def test_email():
     print("\n=== Configuration ===")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
-    print(f"MAILERSEND_API_KEY set: {'Yes' if api_key else 'No'}")
+    print(f"MAILERSEND_API_KEY: {'[HIDDEN]' if api_key else 'Not set'}")
+    
+    # Print all env vars for debugging
+    print("\nAll environment variables:")
+    for key, value in os.environ.items():
+        if 'KEY' in key or 'TOKEN' in key or 'SECRET' in key:
+            print(f"{key}: [HIDDEN]")
+        else:
+            print(f"{key}: {value}")
 
     if not all([from_email, to_email, api_key]):
         print("\nError: Missing required environment variables.")
