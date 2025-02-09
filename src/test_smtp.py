@@ -12,8 +12,15 @@ def read_env_file(path):
             for line in f:
                 line = line.strip()
                 if line and not line.startswith('#'):
-                    key, value = line.split('=', 1)
-                    env_vars[key.strip()] = value.strip()
+                    # Split on first = only
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip()
+                        # Remove inline comments (anything after #)
+                        if '#' in value:
+                            value = value.split('#')[0].strip()
+                        env_vars[key] = value
     except Exception as e:
         print(f"Error reading env file: {e}")
     return env_vars
@@ -51,7 +58,7 @@ def test_email():
     
     # Print all loaded values
     print("\nLoaded .env values:")
-    for key, value in env_vars.items():
+    for key, value in sorted(env_vars.items()):
         if 'KEY' in key or 'TOKEN' in key or 'SECRET' in key:
             print(f"{key}: [HIDDEN]")
         else:
