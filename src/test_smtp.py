@@ -3,6 +3,7 @@ Email Test Script using MailerSend
 """
 import os
 from mailersend import emails
+import json
 
 def read_env_file(path):
     """Read environment variables directly from file."""
@@ -85,24 +86,48 @@ def test_email():
 
         print("2. Sending email...")
         # Send email
-        response = mailer.send({
+        mail_body = {
             "from": mail_from,
             "to": recipients,
             "subject": "Test Email from MailerSend",
             "text": "This is a test email sent using MailerSend.",
             "html": "<p>This is a test email sent using MailerSend.</p>"
-        })
-
-        if response.status_code == 202:
-            print("\nSuccess! Email sent successfully.")
-            print(f"Message ID: {response.headers.get('x-message-id')}")
+        }
+        
+        print("Email data:", json.dumps(mail_body, indent=2))
+        response = mailer.send(mail_body)
+        
+        print("\nAPI Response:", response)
+        if isinstance(response, str):
+            try:
+                response_data = json.loads(response)
+                if response_data.get('status', '') == 'success':
+                    print("\nSuccess! Email sent successfully.")
+                    print(f"Response data: {json.dumps(response_data, indent=2)}")
+                else:
+                    print(f"\nError: Failed to send email.")
+                    print(f"Response: {json.dumps(response_data, indent=2)}")
+            except json.JSONDecodeError:
+                print(f"\nError: Unexpected response format")
+                print(f"Response: {response}")
         else:
-            print(f"\nError: Failed to send email. Status code: {response.status_code}")
-            print(f"Response: {response.text}")
+            # Handle response object
+            if hasattr(response, 'status_code'):
+                if response.status_code == 202:
+                    print("\nSuccess! Email sent successfully.")
+                    print(f"Message ID: {response.headers.get('x-message-id')}")
+                else:
+                    print(f"\nError: Failed to send email. Status code: {response.status_code}")
+                    print(f"Response: {response.text}")
+            else:
+                print(f"\nError: Unexpected response type: {type(response)}")
+                print(f"Response: {response}")
             
     except Exception as e:
         print(f"\nError occurred: {str(e)}")
         print(f"Error type: {type(e).__name__}")
+        if hasattr(e, '__dict__'):
+            print(f"Error details: {e.__dict__}")
 
 if __name__ == "__main__":
     test_email()
