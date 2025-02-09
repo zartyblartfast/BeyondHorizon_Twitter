@@ -3,7 +3,20 @@ Email Test Script using MailerSend
 """
 import os
 from mailersend import emails
-from dotenv import load_dotenv, dotenv_values
+
+def read_env_file(path):
+    """Read environment variables directly from file."""
+    env_vars = {}
+    try:
+        with open(path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    key, value = line.split('=', 1)
+                    env_vars[key.strip()] = value.strip()
+    except Exception as e:
+        print(f"Error reading env file: {e}")
+    return env_vars
 
 def test_email():
     print("\n=== Environment Debug Info ===")
@@ -13,6 +26,7 @@ def test_email():
     env_path = os.path.join(os.path.dirname(script_dir), 'config', '.env')
     print(f"\n1. Loading .env from: {env_path}")
     print(f"File exists: {os.path.exists(env_path)}")
+    print(f"Absolute path: {os.path.abspath(env_path)}")
     
     # Print raw file contents for debugging
     print("\n2. Raw .env file contents:")
@@ -22,24 +36,22 @@ def test_email():
     except Exception as e:
         print(f"Error reading .env file: {e}")
     
-    print("\n3. Loading environment variables...")
-    # Try both methods of loading env vars
-    config = dotenv_values(env_path)
-    load_dotenv(env_path)
+    print("\n3. Loading environment variables directly...")
+    env_vars = read_env_file(env_path)
     
-    # Get configuration (try both env and config)
-    from_email = os.getenv('FROM_EMAIL') or config.get('FROM_EMAIL')
-    to_email = os.getenv('TO_EMAIL') or config.get('TO_EMAIL')
-    api_key = os.getenv('MAILERSEND_API_KEY') or config.get('MAILERSEND_API_KEY')
+    # Get configuration
+    from_email = env_vars.get('FROM_EMAIL')
+    to_email = env_vars.get('TO_EMAIL')
+    api_key = env_vars.get('MAILERSEND_API_KEY')
 
     print("\n=== Configuration ===")
     print(f"FROM_EMAIL: {from_email}")
     print(f"TO_EMAIL: {to_email}")
     print(f"MAILERSEND_API_KEY: {'[HIDDEN]' if api_key else 'Not set'}")
     
-    # Print all loaded values from .env
+    # Print all loaded values
     print("\nLoaded .env values:")
-    for key, value in config.items():
+    for key, value in env_vars.items():
         if 'KEY' in key or 'TOKEN' in key or 'SECRET' in key:
             print(f"{key}: [HIDDEN]")
         else:
