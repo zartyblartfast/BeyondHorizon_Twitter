@@ -7,20 +7,19 @@ import logging
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
-# Set up logging to also go to stdout for PythonAnywhere scheduler
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.StreamHandler(sys.stderr)
-    ]
-)
-
 # Add parent directory to path for imports
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
+
+# Set up logging to stdout only
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 # Load environment variables from config/.env
 config_path = os.path.join(parent_dir, 'config', '.env')
@@ -126,6 +125,7 @@ def main():
             return
             
         # Random wait before posting
+        logging.info("=== Enough time has passed - preparing to post ===")
         random_wait()
         
         # Run the tweet manager
