@@ -125,7 +125,65 @@ def main():
         )
 ```
 
-### 4. Email Reporting
+### 4. Automated Tweet Scheduling
+
+#### ScheduledTweetRunner (`src/scheduled_tweet_runner.py`)
+Manages automated tweet posting with configurable intervals and random delays:
+
+```python
+class ScheduledTweetRunner:
+    """Wrapper script for automated tweet management with configurable intervals"""
+    
+    def should_post_today(self):
+        """Check if enough days have passed since last tweet"""
+        
+    def random_wait(self):
+        """Add random delay before posting to create natural timing"""
+```
+
+Configuration (in `.env`):
+```bash
+# Number of days between tweets (default: 3, max: 14)
+SCHEDULED_DAYS_INTERVAL=3
+
+# Maximum random wait in minutes before posting (default: 10, max: 15)
+SCHEDULED_RANDOM_MINUTES=10
+```
+
+Features:
+- Configurable posting interval (1-14 days)
+- Random wait period before posting (1-15 minutes)
+- Dry run mode for testing
+- Detailed logging of all actions
+- Safety checks for environment variables
+
+Example log output:
+```
+=== Starting scheduled tweet runner ===
+Using production environment
+Last tweet was 3 days and 2 hours ago
+Waiting for 3 days between tweets
+Adding random wait of 5 minutes and 30 seconds
+Running tweet manager...
+=== Tweet manager completed successfully ===
+```
+
+#### PythonAnywhere Deployment
+Schedule the runner to check daily:
+```bash
+python3 /home/BeyondHorizon/BeyondHorizon_Twitter/src/scheduled_tweet_runner.py
+```
+
+The script will:
+1. Check if enough days have passed since last tweet
+2. If ready to post:
+   - Add random wait time
+   - Post tweet with images
+   - Record in history database
+3. If not ready:
+   - Log status and exit
+
+### 5. Email Reporting
 Reports will include:
 - Formatted ASCII table using PrettyTable
 - Recent tweet history (last 7 days by default)
@@ -148,7 +206,7 @@ Recent Tweet History:
 +------------------+----------------------+---------+----------------------------------------+-------------+
 ```
 
-### 5. Environment Setup
+### 6. Environment Setup
 ```python
 def get_db_path():
     """Get database path based on environment"""

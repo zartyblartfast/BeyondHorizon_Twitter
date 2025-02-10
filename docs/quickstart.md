@@ -39,6 +39,10 @@
      # Development Settings
      ENVIRONMENT=development  # or production
      DEBUG=true
+
+     # Scheduling Configuration
+     SCHEDULED_DAYS_INTERVAL=3     # Days between tweets (1-14)
+     SCHEDULED_RANDOM_MINUTES=10   # Max random wait before posting (1-15)
      ```
 
 ## Testing the Setup
@@ -59,6 +63,9 @@
 
    # Test with random preset
    python src/tweet_manager.py --dry-run --random
+
+   # Test scheduled tweet runner
+   DRY_RUN=true python src/scheduled_tweet_runner.py
    ```
 
 ## Project Structure
@@ -70,17 +77,24 @@ BeyondHorizon_Twitter/
 ├── data/
 │   └── tweet_history_*.db    # SQLite databases for different environments
 ├── docs/
-│   ├── quickstart.md       # This guide
-│   └── preset_manager.md    # Preset management documentation
+│   ├── quickstart.md         # This guide
+│   └── preset_manager.md     # Preset management documentation
 ├── src/
 │   ├── location_manager.py   # Location data management
 │   ├── preset_manager.py     # Preset rotation and history
+│   ├── scheduled_tweet_runner.py  # Automated tweet scheduling
 │   ├── tweet_db.py          # Database operations
 │   └── tweet_manager.py     # Tweet generation and posting
 └── requirements.txt         # Python dependencies
 ```
 
 ## Recent Updates
+
+### Automated Tweet Scheduling
+- Added scheduled tweet runner with configurable intervals
+- Implemented random wait times for natural posting
+- Added comprehensive logging system
+- Support for dry run testing
 
 ### Preset Management System
 - Added SQLite database for tweet history tracking
@@ -95,10 +109,18 @@ BeyondHorizon_Twitter/
 ## Current Status
 
 1. **Working Features**
+   - Automated tweet scheduling
    - Tweet generation and posting
    - Preset management and rotation
    - History tracking
    - Comprehensive testing options
+
+2. **Scheduling Features**
+   - Configurable posting intervals (1-14 days)
+   - Random wait times (1-15 minutes)
+   - Detailed logging
+   - Dry run mode for testing
+   - PythonAnywhere deployment support
 
 ## Troubleshooting
 
