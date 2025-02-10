@@ -38,5 +38,6 @@ logs/
 *.log
 config/secrets.json
 
-# Databases
-data/tweet_history_*.db
+# Data directory - ignore all contents except .gitkeep
+data/*
+!data/.gitkeep
