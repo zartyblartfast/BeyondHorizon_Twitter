@@ -1,5 +1,20 @@
+# Core dependencies
 openai>=1.0.0
 tweepy>=4.14.0
 python-dotenv>=1.0.0
-schedule>=1.2.0
 requests>=2.31.0
+schedule>=1.2.0
+
+# Web dashboard
+Flask>=3.0.0
+Werkzeug>=3.0.0
+
+# Database and reporting
+prettytable>=3.9.0
+pandas>=2.1.0
+
+# Email functionality
+mailersend>=0.2.5
+
+# Testing and development
+pytest>=7.4.0
