@@ -13,12 +13,11 @@ class PresetManager:
         """Get the next preset to post, considering history"""
         all_presets = self.location_manager.get_all_locations()['presets']
         
-        # Get recent history (last 30 days)
+        # Get all successful tweets in order of most recent first
         query = """
             SELECT preset_name 
             FROM tweet_history 
-            WHERE posted_at >= datetime('now', '-30 days')
-            AND status = 'success'
+            WHERE status = 'success'
             ORDER BY posted_at DESC
         """
         used_presets = [row[0] for row in self.db.execute_query(query)]
