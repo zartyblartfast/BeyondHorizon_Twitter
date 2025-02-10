@@ -4,7 +4,6 @@ BeyondHorizon Tweet Manager
 This script manages the automated tweeting system for BeyondHorizon:
 - Posts tweets with preset content and images
 - Manages tweet history in a SQLite database
-- Sends email reports after each tweet
 - Provides testing and dry-run capabilities
 
 Usage:
@@ -14,9 +13,6 @@ Usage:
     Test without posting:
     python tweet_manager.py --dry-run
 
-    Just send email report:
-    python tweet_manager.py --email-report
-
     List available presets:
     python tweet_manager.py --list-presets
 
@@ -25,7 +21,6 @@ Usage:
 
 Environment Variables Required:
     - Twitter API credentials in .env
-    - Email settings in .env
 """
 from location_manager import LocationManager
 from twitter_client import TwitterClient
@@ -38,9 +33,6 @@ import textwrap
 import random
 import os
 from datetime import datetime
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
 # Configure logging with a cleaner format
@@ -56,16 +48,11 @@ def wrap_url(url, width=70):
 
 def preview_tweet(tweet_content, image_urls=None):
     """Display a preview of the tweet content"""
-    print("\nTEXT CONTENT:")
-    print("-" * 70)
-    # Use sys.stdout.buffer.write to handle Unicode characters
-    import sys
-    sys.stdout.buffer.write(textwrap.fill(tweet_content.strip(), width=70).encode('utf-8'))
-    sys.stdout.buffer.write(b'\n')
+    print("\nPREVIEW OF TWEET CONTENT:")
+    print(tweet_content)
     
     if image_urls:
         print("\nIMAGE URLS:")
-        print("-" * 70)
         for url in image_urls:
             print(url)
 
@@ -77,109 +64,16 @@ def get_db_path():
     db_name = f"tweet_history_{env}.db"
     return os.path.join(base_dir, 'data', db_name)
 
-def send_email_report(report_content):
-    """Send an email with the tweet history report."""
-    # Get absolute path to .env file
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    env_path = os.path.join(os.path.dirname(script_dir), 'config', '.env')
-    print(f"\nDebug: Script directory: {script_dir}")
-    print(f"Debug: Looking for .env file at: {env_path}")
-    print(f"Debug: .env file exists: {os.path.exists(env_path)}")
-    
-    # Load environment variables
-    load_dotenv(env_path)
-    
-    # Get email configuration from environment
-    from_email = 'longlineofsight@gmail.com'  # Dedicated email account
-    to_email = os.getenv('TO_EMAIL')
-    email_password = 'Saturday123!'
-    
-    # Debug logging
-    print("\nDebug: Environment variables:")
-    print(f"FROM_EMAIL: {from_email}")
-    print(f"TO_EMAIL: {to_email}")
-    print(f"PYTHONANYWHERE_SITE: {'Set' if 'PYTHONANYWHERE_SITE' in os.environ else 'Not set'}")
-    
-    # Create email subject
-    subject = f'BeyondHorizon Tweet Report - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
-    
-    # Convert the report to HTML format
-    html_content = f"""
-    <html>
-        <head>
-            <style>
-                table {{ border-collapse: collapse; width: 100%; }}
-                th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                th {{ background-color: #f2f2f2; }}
-            </style>
-        </head>
-        <body>
-            <h2>BeyondHorizon Tweet History Report</h2>
-            <pre>{report_content}</pre>
-        </body>
-    </html>
-    """
-    
-    try:
-        # For local testing, just print the email
-        if 'PYTHONANYWHERE_SITE' not in os.environ:
-            print("\nEmail would be sent with following content:")
-            print(f"From: {from_email}")
-            print(f"To: {to_email}")
-            print(f"Subject: {subject}")
-            print("\nContent:")
-            print(html_content)
-        else:
-            # On PythonAnywhere, use Gmail SMTP
-            try:
-                import smtplib
-                from email.mime.text import MIMEText
-                from email.mime.multipart import MIMEMultipart
-                
-                # Gmail SMTP settings
-                smtp_server = "smtp.gmail.com"
-                smtp_port = 587
-                
-                # Create message
-                msg = MIMEMultipart('alternative')
-                msg['Subject'] = subject
-                msg['From'] = from_email
-                msg['To'] = to_email
-                msg.attach(MIMEText(html_content, 'html'))
-                
-                print("\nDebug: Connecting to Gmail SMTP...")
-                # Send email
-                with smtplib.SMTP(smtp_server, smtp_port) as server:
-                    server.starttls()
-                    print("Debug: Attempting login...")
-                    server.login(from_email, email_password)
-                    print("Debug: Sending message...")
-                    server.send_message(msg)
-                print("Email sent successfully via Gmail SMTP")
-                    
-            except ImportError as e:
-                print(f"\nError importing email modules: {str(e)}")
-                raise
-            except Exception as e:
-                print(f"\nError sending via Gmail SMTP: {str(e)}")
-                raise
-            
-        print("\nEmail report handled successfully")
-    except Exception as e:
-        print(f"\nError handling email report: {str(e)}")
-
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='BeyondHorizon Tweet Manager - Posts tweets, manages history, and sends reports'
+        description='BeyondHorizon Tweet Manager - Posts tweets and manages history'
     )
     
     # Operation modes
     mode_group = parser.add_argument_group('Operation Modes')
     mode_group.add_argument('--dry-run', action='store_true', 
                           help='Show tweet content without posting')
-    mode_group.add_argument('--email-report', action='store_true',
-                          help='Just send the email report without posting')
     mode_group.add_argument('--list-presets', action='store_true',
                           help='List all available presets and exit')
     mode_group.add_argument('--show-history', action='store_true',
@@ -238,14 +132,6 @@ def main():
     # Show history if requested
     if args.show_history:
         print(report_manager.generate_report())
-        return
-    
-    # Just show email report if requested
-    if args.email_report:
-        print("\nGenerating email report...")
-        report = report_manager.generate_report()
-        print("\nAttempting to send email report...")
-        send_email_report(report)
         return
     
     # Get all locations for listing
@@ -336,13 +222,6 @@ def main():
             error_message=str(e)
         )
         print(f"\nError posting tweet: {str(e)}")
-
-    # After successful tweet or dry run, send email report if not in test mode
-    print("\nGenerating email report...")
-    report = report_manager.generate_report()
-    if not args.test_record:  # Don't send emails during testing
-        print("\nAttempting to send email report...")
-        send_email_report(report)
 
 if __name__ == "__main__":
     main()
