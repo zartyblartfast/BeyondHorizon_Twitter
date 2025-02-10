@@ -175,8 +175,11 @@ def main():
     # Show preview
     preview_tweet(tweet_content, image_urls)
     
-    if args.dry_run:
-        print("\nDRY RUN - Tweet not posted")
+    # Check if this is a dry run
+    dry_run = os.getenv('DRY_RUN', 'false').lower() == 'true' or args.dry_run
+    if dry_run:
+        logging.info(f"DRY RUN: Would post tweet for preset: {location['name']}")
+        logging.info(f"Tweet text would be: {tweet_content}")
         if args.test_record:
             print("\nTEST MODE - Recording to database")
             preset_manager.record_tweet_result(
