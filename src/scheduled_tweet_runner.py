@@ -7,6 +7,16 @@ import logging
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
+# Set up logging to also go to stdout for PythonAnywhere scheduler
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.StreamHandler(sys.stderr)
+    ]
+)
+
 # Add parent directory to path for imports
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
@@ -31,12 +41,6 @@ MIN_RANDOM_MINUTES = 1
 MAX_RANDOM_MINUTES = 15
 DEFAULT_RANDOM_MINUTES = 10
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
 def get_safe_int_env(var_name: str, default: int, min_val: int, max_val: int) -> int:
     """Get an environment variable with safety bounds"""
     try:
@@ -47,6 +51,7 @@ def get_safe_int_env(var_name: str, default: int, min_val: int, max_val: int) ->
         if value > max_val:
             logging.warning(f"{var_name} value {value} above maximum, using {max_val}")
             return max_val
+        logging.info(f"{var_name} set to {value}")
         return value
     except (ValueError, TypeError) as e:
         logging.warning(f"Invalid {var_name} value, using default {default}: {str(e)}")
@@ -64,6 +69,7 @@ def should_post_today(db: TweetDB) -> bool:
     # Result is a tuple, not a dictionary
     last_tweet_date = datetime.strptime(result[0][0], '%Y-%m-%d %H:%M:%S')
     days_since_last_tweet = (datetime.now() - last_tweet_date).days
+    hours_since_last_tweet = int((datetime.now() - last_tweet_date).total_seconds() / 3600)
     
     days_interval = get_safe_int_env(
         'SCHEDULED_DAYS_INTERVAL', 
@@ -72,7 +78,8 @@ def should_post_today(db: TweetDB) -> bool:
         MAX_DAYS_INTERVAL
     )
     
-    logging.info(f"Days since last tweet: {days_since_last_tweet} (interval: {days_interval})")
+    logging.info(f"Last tweet was {days_since_last_tweet} days and {hours_since_last_tweet % 24} hours ago")
+    logging.info(f"Waiting for {days_interval} days between tweets")
     return days_since_last_tweet >= days_interval
 
 def random_wait():
@@ -91,12 +98,16 @@ def random_wait():
         )
     
     seconds = random.randint(0, max_minutes * 60)
-    logging.info(f"Waiting {seconds} seconds (max {max_minutes} minutes) before posting")
+    wait_mins = seconds // 60
+    wait_secs = seconds % 60
+    logging.info(f"Adding random wait of {wait_mins} minutes and {wait_secs} seconds")
     time.sleep(seconds)
 
 def main():
     """Main function to manage scheduled tweet posting"""
     try:
+        logging.info("=== Starting scheduled tweet runner ===")
+        
         # Initialize database
         env = os.getenv('ENVIRONMENT', 'development')
         db_path = os.path.join(parent_dir, 'data', 
@@ -106,12 +117,12 @@ def main():
             logging.error(f"Database not found: {db_path}")
             return
             
-        logging.info(f"Using database: {db_path}")
+        logging.info(f"Using {env} environment")
         db = TweetDB(db_path)
         
         # Check if we should post today
         if not should_post_today(db):
-            logging.info("Not enough days since last tweet, skipping")
+            logging.info("Skipping - not enough time has passed since last tweet")
             return
             
         # Random wait before posting
@@ -123,7 +134,7 @@ def main():
             logging.error(f"Tweet manager not found: {tweet_manager_path}")
             return
             
-        logging.info("Running tweet manager")
+        logging.info("Running tweet manager...")
         # Set DRY_RUN in environment if specified
         dry_run = os.getenv('DRY_RUN', 'false').lower() == 'true'
         if dry_run:
@@ -133,7 +144,7 @@ def main():
         result = os.system(f'python {tweet_manager_path}')
         
         if result == 0:
-            logging.info("Tweet manager completed successfully")
+            logging.info("=== Tweet manager completed successfully ===")
         else:
             logging.error(f"Tweet manager failed with exit code: {result}")
             
