@@ -1,0 +1,120 @@
+# Quick Setup Guide
+
+## Initial Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/BeyondHorizon_Twitter.git
+   cd BeyondHorizon_Twitter
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   
+   # Windows (Command Prompt)
+   .venv\Scripts\activate
+   
+   # Windows (PowerShell)
+   .\.venv\Scripts\Activate.ps1
+   
+   # Unix/MacOS
+   source .venv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Set up environment variables:
+   - Create a new file `config/.env` with the following structure:
+     ```
+     # Twitter API Configuration
+     TWITTER_API_KEY=your_api_key_here
+     TWITTER_API_SECRET=your_api_secret_here
+     TWITTER_ACCESS_TOKEN=your_access_token_here
+     TWITTER_ACCESS_SECRET=your_access_secret_here
+
+     # Development Settings
+     ENVIRONMENT=development  # or production
+     DEBUG=true
+     ```
+
+## Testing the Setup
+
+1. **Test Tweet Generation**
+   ```bash
+   # Show tweet preview without posting
+   python src/tweet_manager.py --dry-run
+
+   # Test with specific preset location
+   python src/tweet_manager.py --dry-run --preset "Mount Everest to Kanchenjunga"
+
+   # List all available presets
+   python src/tweet_manager.py --list-presets
+
+   # View tweet history
+   python src/tweet_manager.py --show-history
+
+   # Test with random preset
+   python src/tweet_manager.py --dry-run --random
+   ```
+
+## Project Structure
+
+```
+BeyondHorizon_Twitter/
+├── config/
+│   └── .env                  # Environment variables (not in git)
+├── data/
+│   └── tweet_history_*.db    # SQLite databases for different environments
+├── docs/
+│   ├── quickstart.md       # This guide
+│   └── preset_manager.md    # Preset management documentation
+├── src/
+│   ├── location_manager.py   # Location data management
+│   ├── preset_manager.py     # Preset rotation and history
+│   ├── tweet_db.py          # Database operations
+│   └── tweet_manager.py     # Tweet generation and posting
+└── requirements.txt         # Python dependencies
+```
+
+## Recent Updates
+
+### Preset Management System
+- Added SQLite database for tweet history tracking
+- Implemented continuous preset rotation
+- Added comprehensive testing tools
+
+### Tweet Management
+- Simplified tweet preview functionality
+- Improved error handling and validation
+- Added support for dry runs and testing
+
+## Current Status
+
+1. **Working Features**
+   - Tweet generation and posting
+   - Preset management and rotation
+   - History tracking
+   - Comprehensive testing options
+
+## Troubleshooting
+
+1. **Database Issues**
+   - Check environment setting in `.env`
+   - Verify database file exists in `data/` directory
+   - Use `--clear-history` to reset test database
+   - Check file permissions
+
+2. **Tweet Generation Issues**
+   - Use `--dry-run` to test without posting
+   - Check Twitter API credentials
+   - Review history with `--show-history`
+
+## Getting Help
+
+- Check `docs/preset_manager.md` for detailed system documentation
+- Review test outputs for detailed error messages
+- Use `--list-presets` to verify available locations

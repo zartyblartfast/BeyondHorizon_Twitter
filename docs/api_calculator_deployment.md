@@ -24,6 +24,8 @@ BeyondHorizonCalc-Function/
 
 ## API Usage
 
+For detailed information about the calculations performed by the API, see [Calculation Specification](calculation_specification.md).
+
 ### Request Format
 ```json
 {
@@ -38,17 +40,29 @@ BeyondHorizonCalc-Function/
 ### Response Format
 ```json
 {
-    "hidden_height": 1.834,           // meters
-    "horizon_distance": 5.222,        // kilometers
-    "total_distance": 10.0,           // kilometers
-    "dip_angle": 0.045,              // degrees
-    "is_metric": true,
-    "visible_target_height": 98.166,  // meters
-    "apparent_visible_height": 98.166,// meters
-    "perspective_scaled_height": 8.924,// meters
-    "target_visible": true
+    "D1": 5.222,                    // Distance to horizon (km)
+    "hidden_height": 1.834,         // Hidden height (m)
+    "visible_target_height": 98.166, // Visible height (m)
+    "CD": 98.123,                   // Apparent height (m)
+    "dip_angle": 0.045,             // Horizon dip angle (degrees)
+    "perspective_scaled_height": 0.009812, // Height/distance ratio
+    "is_visible": true,             // Target visibility status
+    "total_distance": 10.0,         // Total distance (km)
+    "trace": {                      // Optional calculation trace
+        "steps": [
+            {
+                "description": "Initial parameters",
+                "formula": "N/A",
+                "inputs": {...},
+                "result": 0.0
+            },
+            // Additional calculation steps...
+        ]
+    }
 }
 ```
+
+The `trace` field provides detailed step-by-step calculation information, useful for debugging and verification. Each step includes the formula used, input values, and the result.
 
 ## Configuration Settings
 1. Azure Function App:
