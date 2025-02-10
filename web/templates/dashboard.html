@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BeyondHorizon Twitter Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { padding: 20px; }
+        .card { margin-bottom: 20px; }
+        .table td { vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <h1 class="mb-4">BeyondHorizon Twitter Dashboard</h1>
+        
+        <!-- System Info -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-info-circle"></i> System Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Python Version:</strong><br>
+                        {{ system_info.python_version }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Environment:</strong><br>
+                        {{ system_info.flask_env }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Memory Usage:</strong><br>
+                        {{ system_info.memory_usage }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Current Time:</strong><br>
+                        {{ system_info.current_time }}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <strong>Database:</strong><br>
+                        {{ system_info.db_path }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tweet History -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-twitter"></i> Recent Tweets
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Preset</th>
+                                <th>Tweet</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tweet in tweets %}
+                            <tr class="{{ 'table-danger' if tweet.status == 'error' else 'table-success' if tweet.status == 'success' }}">
+                                <td>{{ tweet.posted_at }}</td>
+                                <td>{{ tweet.preset_name }}</td>
+                                <td>
+                                    {% if tweet.tweet_id != 'none' and tweet.status == 'success' %}
+                                        <a href="https://x.com/BeyondHorizonC/status/{{ tweet.tweet_id }}" target="_blank" class="text-decoration-none">
+                                            {{ tweet.tweet_text }}
+                                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                        </a>
+                                    {% else %}
+                                        {{ tweet.tweet_text }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if tweet.status == 'success' %}
+                                        <span class="text-success">
+                                            <i class="bi bi-check-circle"></i> Success
+                                        </span>
+                                    {% else %}
+                                        <span class="text-danger">
+                                            <i class="bi bi-x-circle"></i> Error
+                                            {% if tweet.error_message %}
+                                                <br><small>{{ tweet.error_message }}</small>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

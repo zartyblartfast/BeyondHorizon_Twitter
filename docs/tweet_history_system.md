@@ -158,6 +158,43 @@ def get_db_path():
     return os.path.join(base_dir, 'data', db_name)
 ```
 
+## Viewing Database Contents
+
+To view the current contents of the tweet history database:
+
+```bash
+# View both tables (post_types and tweet_history)
+python src/view_db.py
+
+# For development database (default)
+python src/view_db.py test
+
+# For production database
+python src/view_db.py prod
+```
+
+This will display a nicely formatted table showing:
+- All tweet records with their status
+- Post types and descriptions
+- Total row counts for each table
+
+Example output:
+```
+=== tweet_history Table ===
++----+--------------+-----------------------------------+----------+--------------+---------------------+---------+---------------+
+| id | post_type_id | preset_name                       | tweet_id | tweet_text   | posted_at           | status  | error_message |
++----+--------------+-----------------------------------+----------+--------------+---------------------+---------+---------------+
+| 1  | 1            | Pic de Finstrelles to Pic Gaspard | 123456   | Test tweet 1 | 2025-02-08 21:45:23 | success | None          |
++----+--------------+-----------------------------------+----------+--------------+---------------------+---------+---------------+
+Total rows: 1
+```
+
+The database viewer uses PrettyTable for formatting and shows:
+- Tweet IDs and status
+- Preset names and post times
+- Error messages if any tweets failed
+- Row counts for each table
+
 ## Next Steps
 1. Implement database initialization script
 2. Create core classes (PresetManager, ReportManager, TweetDB)
