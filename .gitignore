@@ -38,5 +38,5 @@ logs/
 *.log
 config/secrets.json
 
-# Development database
-data/tweet_history_development.db
+# Databases
+data/tweet_history_*.db
