@@ -17,10 +17,10 @@ app = Flask(__name__)
 
 def get_db_path():
     """Get database path based on environment"""
-    env = os.getenv('FLASK_ENV', 'development')
+    env = os.getenv('ENVIRONMENT', 'development')
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if env == 'development':
-        db_path = os.path.join(base_dir, 'data', 'tweet_history_test.db')
+        db_path = os.path.join(base_dir, 'data', 'tweet_history_development.db')
     elif env == 'production':
         db_path = os.path.join(base_dir, 'data', 'tweet_history_production.db')
     else:
@@ -103,7 +103,7 @@ def dashboard():
         # Get system info
         system_info = {
             'python_version': sys.version.split()[0],
-            'flask_env': os.getenv('FLASK_ENV', 'development'),
+            'flask_env': os.getenv('ENVIRONMENT', 'development'),
             'memory_usage': f"{psutil.Process().memory_info().rss / 1024 / 1024:.1f}MB",
             'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'db_path': get_db_path()
