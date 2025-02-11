@@ -90,6 +90,12 @@ class TwitterClient:
                 media_ids=media_ids if media_ids else None
             )
             
+            # Debug logging
+            print("\nTwitter API Response:")
+            print(f"Response data: {response.data}")
+            print(f"Response includes: {response.includes if hasattr(response, 'includes') else 'None'}")
+            print(f"Tweet ID from response: {response.data['id']}")
+            
             # Update last tweet time
             self.last_tweet_time = datetime.datetime.now()
             
