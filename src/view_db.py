@@ -3,10 +3,16 @@ import sqlite3
 import os
 from prettytable import PrettyTable
 
-def get_db_path(env='test'):
-    """Get database path"""
+def get_db_path(env='development'):
+    """Get the database path for the specified environment"""
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_dir, 'data', f'tweet_history_{env}.db')
+    if env == 'production':
+        db_name = "tweet_history_production.db"
+    elif env == 'development':
+        db_name = "tweet_history_development.db"
+    else:
+        db_name = "tweet_history_test.db"
+    return os.path.join(base_dir, 'data', db_name)
 
 def view_table(cursor, table_name):
     """Display contents of a table"""

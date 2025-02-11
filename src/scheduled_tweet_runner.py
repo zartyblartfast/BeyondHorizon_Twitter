@@ -115,7 +115,13 @@ def main():
         
         # Initialize database
         env = os.getenv('ENVIRONMENT', 'development')
-        db_name = f"tweet_history_{env}.db"  # Match tweet_manager.py naming
+        if env == 'production':
+            db_name = "tweet_history_production.db"
+        elif env == 'development':
+            db_name = "tweet_history_development.db"
+        else:
+            db_name = "tweet_history_test.db"
+        
         db_path = os.path.join(parent_dir, 'data', db_name)
         
         # Ensure data directory exists with correct permissions

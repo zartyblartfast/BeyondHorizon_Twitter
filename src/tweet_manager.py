@@ -61,7 +61,12 @@ def get_db_path():
     load_dotenv()
     env = os.getenv('ENVIRONMENT', 'development')
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_name = f"tweet_history_{env}.db"
+    if env == 'production':
+        db_name = "tweet_history_production.db"
+    elif env == 'development':
+        db_name = "tweet_history_development.db"
+    else:
+        db_name = "tweet_history_test.db"
     return os.path.join(base_dir, 'data', db_name)
 
 def main():

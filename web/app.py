@@ -21,8 +21,10 @@ def get_db_path():
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if env == 'development':
         db_path = os.path.join(base_dir, 'data', 'tweet_history_test.db')
+    elif env == 'production':
+        db_path = os.path.join(base_dir, 'data', 'tweet_history_production.db')
     else:
-        db_path = os.path.join(base_dir, 'data', 'tweet_history_prod.db')
+        db_path = os.path.join(base_dir, 'data', 'tweet_history_test.db')
     print(f"Using database: {db_path}")
     print(f"Database exists: {os.path.exists(db_path)}")
     return db_path
