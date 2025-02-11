@@ -4,6 +4,7 @@ import sys
 import time
 import random
 import logging
+import subprocess
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
@@ -32,7 +33,7 @@ else:
 from src.tweet_db import TweetDB
 
 # Constants for safety limits
-MIN_DAYS_INTERVAL = 1
+MIN_DAYS_INTERVAL = 0  # Allow 0 for testing purposes
 MAX_DAYS_INTERVAL = 14
 DEFAULT_DAYS_INTERVAL = 3
 
@@ -77,6 +78,10 @@ def should_post_today(db: TweetDB) -> bool:
         MAX_DAYS_INTERVAL
     )
     
+    if days_interval == 0:
+        logging.warning("TEST MODE: Days interval is 0 - allowing multiple posts per day")
+        return True
+    
     logging.info(f"Last tweet was {days_since_last_tweet} days and {hours_since_last_tweet % 24} hours ago")
     logging.info(f"Waiting for {days_interval} days between tweets")
     return days_since_last_tweet >= days_interval
@@ -99,7 +104,8 @@ def random_wait():
     seconds = random.randint(0, max_minutes * 60)
     wait_mins = seconds // 60
     wait_secs = seconds % 60
-    logging.info(f"Adding random wait of {wait_mins} minutes and {wait_secs} seconds")
+    
+    logging.info(f"Waiting for {wait_mins}m {wait_secs}s before posting...")
     time.sleep(seconds)
 
 def main():
@@ -109,14 +115,19 @@ def main():
         
         # Initialize database
         env = os.getenv('ENVIRONMENT', 'development')
-        db_path = os.path.join(parent_dir, 'data', 
-                              'tweet_history_test.db' if env == 'development' else 'tweet_history_prod.db')
+        db_name = f"tweet_history_{env}.db"  # Match tweet_manager.py naming
+        db_path = os.path.join(parent_dir, 'data', db_name)
         
-        if not os.path.exists(db_path):
-            logging.error(f"Database not found: {db_path}")
-            return
+        # Ensure data directory exists with correct permissions
+        data_dir = os.path.dirname(db_path)
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir, mode=0o755)
+            logging.info(f"Created data directory: {data_dir}")
             
-        logging.info(f"Using {env} environment")
+        if not os.path.exists(db_path):
+            logging.info(f"Database will be created at: {db_path}")
+            
+        logging.info(f"Using {env} environment with database: {db_path}")
         db = TweetDB(db_path)
         
         # Check if we should post today
@@ -141,12 +152,28 @@ def main():
             logging.info("DRY RUN mode enabled - tweet will not be posted")
             os.environ['DRY_RUN'] = 'true'
             
-        result = os.system(f'python {tweet_manager_path}')
+        # Use subprocess instead of os.system to better handle environment
+        env_copy = os.environ.copy()  # Copy current environment
+        env_copy['PYTHONPATH'] = parent_dir  # Ensure imports work
         
-        if result == 0:
+        result = subprocess.run(
+            [sys.executable, tweet_manager_path],
+            env=env_copy,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        if result.returncode == 0:
             logging.info("=== Tweet manager completed successfully ===")
+            if result.stdout:
+                logging.info("Output:\n" + result.stdout)
         else:
-            logging.error(f"Tweet manager failed with exit code: {result}")
+            logging.error(f"Tweet manager failed with exit code: {result.returncode}")
+            if result.stderr:
+                logging.error("Error output:\n" + result.stderr)
+            if result.stdout:
+                logging.info("Standard output:\n" + result.stdout)
             
     except Exception as e:
         logging.error(f"Error in scheduled tweet runner: {str(e)}", exc_info=True)
