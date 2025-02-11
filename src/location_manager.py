@@ -94,6 +94,7 @@ class LocationManager:
             api_endpoint = f"{api_url}/api/calculate"
             params = {'code': api_key}
             
+            logger.info("Attempting to use Azure Function calculate API...")
             response = requests.post(
                 api_endpoint,
                 params=params,
@@ -101,6 +102,7 @@ class LocationManager:
             )
             response.raise_for_status()
             results = response.json()
+            logger.info("✅ Azure Function calculate API used successfully")
             
             # Format heights with 1 decimal place (using API field names)
             hidden_height = f"{results['h2']:.1f}"
@@ -137,6 +139,7 @@ class LocationManager:
             
         except Exception as e:
             logger.error(f"Failed to get API calculations: {str(e)}")
+            logger.info("Using local calculations as no access to API")
             # Fallback format without calculations
             tweet_lines = [
                 f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
