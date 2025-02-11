@@ -41,3 +41,5 @@ config/secrets.json
 # Data directory - ignore all contents except .gitkeep
 data/*
 !data/.gitkeep
+# SQLite database files
+data/*.db
