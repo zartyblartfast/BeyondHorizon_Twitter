@@ -8,7 +8,25 @@
     <style>
         body { padding: 20px; }
         .card { margin-bottom: 20px; }
-        .table td { vertical-align: middle; }
+        .table td { 
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 0;
+        }
+        .time-col { width: 180px; }
+        .preset-col { width: 200px; }
+        .tweet-col { 
+            max-width: 400px;
+        }
+        .status-col { width: 120px; }
+        .truncate-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -58,10 +76,10 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Time</th>
-                                <th>Preset</th>
-                                <th>Tweet</th>
-                                <th>Status</th>
+                                <th class="time-col">Time</th>
+                                <th class="preset-col">Preset</th>
+                                <th class="tweet-col">Tweet</th>
+                                <th class="status-col">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,12 +89,22 @@
                                 <td>{{ tweet.preset_name }}</td>
                                 <td>
                                     {% if tweet.tweet_id != 'none' and tweet.status == 'success' %}
-                                        <a href="https://x.com/BeyondHorizon_1/status/{{ tweet.tweet_id }}" target="_blank" class="text-decoration-none">
+                                        <a href="https://x.com/BeyondHorizon_1/status/{{ tweet.tweet_id }}" 
+                                           target="_blank" 
+                                           class="text-decoration-none truncate-text"
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="bottom" 
+                                           title="{{ tweet.tweet_text }}">
                                             {{ tweet.tweet_text }}
                                             <i class="bi bi-box-arrow-up-right ms-1"></i>
                                         </a>
                                     {% else %}
-                                        {{ tweet.tweet_text }}
+                                        <span class="truncate-text" 
+                                              data-bs-toggle="tooltip" 
+                                              data-bs-placement="bottom" 
+                                              title="{{ tweet.tweet_text }}">
+                                            {{ tweet.tweet_text }}
+                                        </span>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -101,5 +129,13 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize all tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
 </body>
 </html>
