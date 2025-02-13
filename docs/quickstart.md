@@ -129,7 +129,7 @@ BeyondHorizon_Twitter/
    To update your deployment with latest changes:
    ```bash
    cd BeyondHorizon_Twitter
-   git pull
+   git pull origin main
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
