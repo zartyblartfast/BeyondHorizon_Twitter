@@ -6,6 +6,7 @@ import os
 import urllib.parse
 from datetime import datetime, timedelta
 from pathlib import Path
+from curvature_calculator import CurvatureCalculator
 
 # Configure logging with a cleaner format
 logging.basicConfig(
@@ -19,6 +20,7 @@ class LocationManager:
         self.url = "https://raw.githubusercontent.com/zartyblartfast/BeyondHorizonCalc/main/assets/info/presets.json"
         self.locations = None
         self.last_update = None
+        self.calculator = CurvatureCalculator()  # Add local calculator
 
     def load_locations(self):
         """Load locations from GitHub"""
@@ -140,13 +142,38 @@ class LocationManager:
         except Exception as e:
             logger.error(f"Failed to get API calculations: {str(e)}")
             logger.info("Using local calculations as no access to API")
-            # Fallback format without calculations
-            tweet_lines = [
-                f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m)",
-                f"{observer['country']} to {target['country']} | {location['distance']}km",
-                f"Refraction: {self.format_refraction(location['refractionFactor'])}",
-                "#LongLineOfSight #BeyondHorizon"
-            ]
+            
+            # Use local calculator instead of falling back to format without calculations
+            local_result = self.calculator.calculate_visibility(
+                h1=location['observerHeight'],
+                L0=location['distance'],
+                XZ=location['targetHeight'],
+                refraction_factor=location['refractionFactor']
+            )
+            
+            # Format heights with 1 decimal place (using local calculator field names)
+            hidden_height = f"{local_result['h2']:.1f}"
+            visible_height = f"{local_result['h3']:.1f}"
+            
+            if format == 'compact':
+                tweet_lines = [
+                    f"{observer['name']} → {target['name']}",
+                    f"{location['distance']}km | Refr: {self.format_refraction(location['refractionFactor'])}",
+                    f"Hidden: {hidden_height}m | Visible: {visible_height}m",
+                    "#BeyondHorizon"
+                ]
+            else:
+                tweet_lines = [
+                    f"Long line of sight! 🌍",
+                    f"{observer['name']} ({location['observerHeight']}m) → {target['name']} ({location['targetHeight']}m) | {observer['country']}",
+                    f"Distance: {location['distance']}km | Refraction: {self.format_refraction(location['refractionFactor'])}",
+                    f"{target['name']}:",
+                    f"Hidden Height: {hidden_height}m | Visible Height: {visible_height}m",
+                    "",
+                    f"https://beyondhorizoncalc.com",
+                    "#LongLineOfSight #BeyondHorizon"
+                ]
+            
             return "\n".join(tweet_lines)
 
     def force_refresh(self):
