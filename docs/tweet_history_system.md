@@ -329,6 +329,34 @@ Dedicated test script that verifies:
 - ReportManager formatting
 - Database operations
 
+## Testing
+
+#### Running Tests
+To run the tests with detailed preset information:
+```bash
+python -m unittest tests/test_preset_manager.py -v
+```
+
+The test output will show details for each selected preset:
+- Name of the preset
+- Description
+- Hidden status
+
+This helps verify that:
+1. Hidden presets are being filtered out correctly
+2. Preset rotation is working as expected
+3. Presets without an isHidden flag are treated as visible
+
+Example test output:
+```
+=== Testing hidden presets are filtered ===
+Selected preset details:
+  Name: [preset name]
+  Description: [preset description]
+  Hidden: False
+=========================================
+```
+
 ## Preset Selection Logic
 
 1. **First Run**:

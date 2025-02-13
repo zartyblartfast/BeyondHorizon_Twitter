@@ -15,7 +15,9 @@ class PresetManager:
         
     def get_next_preset(self, dry_run=False):
         """Get the next preset to post, considering history"""
+        # Get all presets and filter out hidden ones
         all_presets = self.location_manager.get_all_locations()['presets']
+        visible_presets = [preset for preset in all_presets if not preset.get('isHidden', False)]
         
         # Get all successful tweets in order of most recent first
         query = """
@@ -33,7 +35,7 @@ class PresetManager:
             return None
         
         # Find first preset not in recent history
-        for preset in all_presets:
+        for preset in visible_presets:
             if preset['name'] not in used_presets:
                 return preset
                 
@@ -57,12 +59,12 @@ class PresetManager:
         
         # Find the preset after the oldest one
         if oldest_preset:
-            for i, preset in enumerate(all_presets):
+            for i, preset in enumerate(visible_presets):
                 if preset['name'] == oldest_preset:
-                    return all_presets[(i + 1) % len(all_presets)]
+                    return visible_presets[(i + 1) % len(visible_presets)]
         
         # If no history at all, start from beginning
-        return all_presets[0]
+        return visible_presets[0]
     
     def record_tweet_result(self, preset_name, tweet_id, tweet_text, success=True, error_message=None):
         """Record the result of a tweet attempt"""

@@ -88,6 +88,60 @@ BeyondHorizon_Twitter/
 └── requirements.txt         # Python dependencies
 ```
 
+## Deployment to PythonAnywhere
+
+1. **Log into PythonAnywhere**
+   - Go to your PythonAnywhere dashboard
+   - Open a Bash console
+
+2. **Clone the Repository**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/your-username/BeyondHorizon_Twitter.git
+   cd BeyondHorizon_Twitter
+   ```
+
+3. **Set Up Virtual Environment**
+   ```bash
+   # Create and activate virtual environment
+   python -m venv .venv
+   source .venv/bin/activate
+
+   # Install dependencies
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment**
+   ```bash
+   # Create and edit .env file
+   mkdir -p config
+   nano config/.env
+   ```
+   Add your configuration (same as local setup)
+
+5. **Set Up Scheduled Task**
+   - Go to PythonAnywhere Tasks tab
+   - Add a new scheduled task
+   - Command to run: `/home/your-username/BeyondHorizon_Twitter/.venv/bin/python /home/your-username/BeyondHorizon_Twitter/src/scheduled_tweet_runner.py`
+   - Set schedule (e.g., daily at a specific time)
+
+6. **Update Deployment**
+   To update your deployment with latest changes:
+   ```bash
+   cd BeyondHorizon_Twitter
+   git pull
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+7. **Verify Setup**
+   ```bash
+   # Test the setup with dry run
+   python src/tweet_manager.py --dry-run
+   ```
+
+Note: Make sure to whitelist api.twitter.com in PythonAnywhere (required for free accounts).
+
 ## Recent Updates
 
 ### Automated Tweet Scheduling
